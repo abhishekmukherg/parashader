@@ -2,11 +2,10 @@
 #define _SPHERE_H_
 
 #include "vectors.h"
-#include "material.h"
-#include <vector>
+#include "ray.h"
+#include "hit.h"
 
-class Face;
-class ArgParser;
+class Material;
 
 // ====================================================================
 // ====================================================================

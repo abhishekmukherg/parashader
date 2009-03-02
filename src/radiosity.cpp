@@ -17,6 +17,8 @@
 #include <GL/glut.h>
 #endif
 
+void CollectFacesWithVertex(Vertex *have, Face *f, vector<Face*> &faces);
+
 // ================================================================
 // CONSTRUCTOR & DESTRUCTOR
 // ================================================================

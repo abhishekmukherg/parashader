@@ -5,6 +5,15 @@
 #include "utils.h"
 #include "math.h"
 
+#ifdef UNUSED
+#elif defined(__GNUC__)
+# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#elif defined(__LCLINT__)
+# define UNUSED(x) /*@unused@*/ x
+#else
+# define UNUSED(x) x
+#endif
+
 template <class ITERATOR_ELEMENT> class Iterator;
 
 enum BAG_ELEMENT_MARK { BAG_MARK_NULL, BAG_MARK_DELETE, BAG_MARK_PRESENT };
@@ -271,7 +280,7 @@ protected:
   void (*extract_func)(BAG_ELEMENT, int &a, int &b, int &c, int &d);
 
   // skip function
-  inline int skip(int orig, int current) const { 
+  inline int skip(int UNUSED(orig), int current) const { 
     assert (current >= 0 && current < size);
     int tmp = (current + 1)%size; 
     assert (current >= 0 && current < size);

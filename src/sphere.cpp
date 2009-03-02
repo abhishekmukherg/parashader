@@ -1,7 +1,6 @@
 #include "sphere.h"
-#include "material.h"
-#include "argparser.h"
-#include "utils.h"
+
+#include <limits>
 
 // Included files for OpenGL Rendering
 #ifdef __APPLE__
@@ -17,25 +16,37 @@
 // ====================================================================
 // ====================================================================
 
-bool Sphere::intersect(const Ray &r, Hit &h) const {
+bool Sphere::intersect(const Ray &r, Hit &h) const
+{
+	const Vec3f &dir = r.getDirection();
+	const Vec3f ori(r.getOrigin() - center);
 
+	const double a = dir.Dot3(dir);
+	const double b = 2 * dir.Dot3(ori);
+	const double c = ori.Dot3(ori) - radius * radius;
+	
+	const double d = b * b - 4 * a * c;
 
+	if (d < std::numeric_limits<double>::epsilon())
+		return false;
+	
+	assert(fabs(d) > std::numeric_limits<double>::epsilon());
 
+	const double t0 = (-b + d) / (2 * a);
+	const double t1 = (-b - d) / (2 * a);
+	assert(t0 >= t1);
 
-  // ==========================================
-  // ASSIGNMENT:  IMPLEMENT SPHERE INTERSECTION
-  // ==========================================
+	const double tf = (t1 >= 0) ? t1 : t0;
+	if (tf < std::numeric_limits<double>::epsilon() || tf >= h.getT())
+		return false;
 
-  // plug the explicit ray equation into the implict sphere equation and solve
-
-
-
-  // fix this: return true if the sphere was intersected, and update
-  // the hit data structure to contain the value of t for the ray at
-  // the intersection point, the material, and the normal
-  return false;
-
-
+	const Vec3f point(r.pointAtParameter(tf));
+	const Vec3f normal(point - center);
+	assert(normal.Length() > 0);
+	h.set(tf, material, normal);
+	h.setTextureCoords(0, 0);
+	/* FIXME: missing setTextureCoordinates */
+	return true;
 } 
 
 // ====================================================================

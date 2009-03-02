@@ -80,7 +80,6 @@ protected:
   bool plane_intersect(const Ray &r, Hit &h, bool intersect_backfacing) const;
 
   // don't use this constructor
-  Face& operator= (const Face &f) { assert(0); exit(0); }
   
   // ==============
   // REPRESENTATION
@@ -91,6 +90,9 @@ protected:
   
   int radiosity_patch_index;  // an awkward pointer to this patch in the Radiosity patch array
   Material *material;
+
+private:
+  Face& operator= (const Face &f);
 
 };
 

@@ -2,6 +2,8 @@
 #include "matrix.h"
 #include "utils.h"
 
+#include <iostream>
+
 // =========================================================================
 // utility functions 
 inline double DistanceBetweenTwoPoints(const Vec3f &p1, const Vec3f &p2) {
@@ -18,7 +20,7 @@ inline double AreaOfTriangle(double a, double b, double c) {
   return sqrt(s*(s-a)*(s-b)*(s-c));
 }
 
-double AreaOfTriangle(const Vec3f &a, const Vec3f &b, const Vec3f &c) {
+inline double AreaOfTriangle(const Vec3f &a, const Vec3f &b, const Vec3f &c) {
   double aside = DistanceBetweenTwoPoints(a,b);
   double bside = DistanceBetweenTwoPoints(b,c);
   double cside = DistanceBetweenTwoPoints(c,a);

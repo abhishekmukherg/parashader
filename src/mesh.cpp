@@ -26,6 +26,7 @@ using std::string;
 #define INITIAL_EDGE 10000
 #define INITIAL_FACE 10000
 
+Vec3f ComputeSpherePoint(double s, double t, const Vec3f center, double radius);
 // =======================================================================
 // CONSTRUCTORS & DESTRUCTORS
 // =======================================================================
