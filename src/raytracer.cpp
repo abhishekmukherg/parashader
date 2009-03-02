@@ -1,16 +1,10 @@
 #include "raytracer.h"
-#include "material.h"
-#include "vectors.h"
-#include "argparser.h"
-#include "raytree.h"
-#include "utils.h"
 #include "mesh.h"
 #include "face.h"
 #include "sphere.h"
 
-
 // casts a single ray through the scene geometry and finds the closest hit
-bool RayTracer::CastRay(Ray &ray, Hit &h, bool use_sphere_patches) const
+bool RayTracer::CastRay(const Ray &ray, Hit &h, bool use_sphere_patches) const
 {
         bool answer = false;
 
@@ -38,7 +32,7 @@ bool RayTracer::CastRay(Ray &ray, Hit &h, bool use_sphere_patches) const
 
 
 // does the recursive (shadow rays & recursive/glossy rays) work
-Vec3f RayTracer::TraceRay(Ray &ray, Hit &hit, int bounce_count) const
+Vec3f RayTracer::TraceRay(const Ray &ray, Hit &hit, int bounce_count) const
 {
 
         hit = Hit();
@@ -80,6 +74,10 @@ Vec3f RayTracer::TraceRay(Ray &ray, Hit &hit, int bounce_count) const
                                 Vec3f dirToLight = pointOnLight - point;
                                 dirToLight.Normalize();
                                 if (normal.Dot3(dirToLight) > 0) {
+					const Ray rayToLight(point, dirToLight);
+					Hit hLight;
+					const Vec3f vLight = TraceRay(rayToLight, hLight, 0);
+
                                         Vec3f lightColor = 0.2 * f->getMaterial()->getEmittedColor() * f->getArea();
                                         answer += m->Shade(ray,hit,dirToLight,lightColor,args);
                                 }
