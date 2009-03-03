@@ -53,44 +53,11 @@ Vec3f RayTracer::TraceRay(const Ray &ray, Hit &hit, int bounce_count) const
                 if (m->getEmittedColor().Length() > 0.001) {
                         answer = Vec3f(1,1,1);
                 } else {
-                        const Vec3f normal(hit.getNormal());
-                        const Vec3f point(ray.pointAtParameter(hit.getT()));
-
-                        // ----------------------------------------------
                         // ambient light
-
                         answer = args->ambient_light_linear *
                                  m->getDiffuseColor(hit.get_s(),hit.get_t());
-
-                        // ----------------------------------------------
-                        // add contributions from each light that is not in shadow
-                        const int num_lights = mesh->getLights().size();
-                        for (int i = 0; i < num_lights; i++) {
-                                const Face *f = mesh->getLights()[i];
-                                const Vec3f pointOnLight = f->computeCentroid();
-                                Vec3f dirToLight = pointOnLight - point;
-                                dirToLight.Normalize();
-                                /* If dot product < 0, surface is not facing light */
-                                if (normal.Dot3(dirToLight) > 0) {
-					Ray rayToLight(point, dirToLight);
-					Hit hLight;
-					bool blocked = CastRay(rayToLight, hLight, false);
-					while (std::fabs(hLight.getT()) < 0.0000001 &&
-							std::fabs((pointOnLight - point).Length()) > STD_EPS) {
-						rayToLight = Ray(rayToLight.pointAtParameter(0.00000001),
-								dirToLight);
-						blocked = CastRay(rayToLight, hLight, false);
-					}
-					RayTree::AddShadowSegment(rayToLight, 0, hLight.getT());
-					if (hLight.getT() == FLT_MAX || hLight.getMaterial() != f->getMaterial()) {
-						continue;
-					}
-
-                                        const Vec3f lightColor = 0.2 * f->getMaterial()->getEmittedColor() * f->getArea();
-                                        answer += m->Shade(ray,hit,dirToLight,lightColor,args);
-                                }
-
-                        }
+                        // Shadows
+                        answer += shadows(ray, hit, m);
 
                         // ----------------------------------------------
                         // add contribution from reflection, if the surface is shiny
@@ -107,4 +74,55 @@ Vec3f RayTracer::TraceRay(const Ray &ray, Hit &hit, int bounce_count) const
         }
 
         return answer;
+}
+
+Vec3f RayTracer::shadows(const Ray &ray, const Hit &hit, const Material *m) const
+{
+	Vec3f answer(0,0,0);
+	// ----------------------------------------------
+	// add contributions from each light that is not in shadow
+	const int num_lights = mesh->getLights().size();
+	for (int i = 0; i < num_lights; i++) {
+		const Face *f = mesh->getLights()[i];
+		const Vec3f pointOnLight = f->computeCentroid();
+
+	        const Vec3f point(ray.pointAtParameter(hit.getT()));
+		answer += shadow(point, pointOnLight, f, m, ray, hit);
+
+
+	}
+	return answer;
+}
+
+Vec3f RayTracer::shadow(const Vec3f &point,
+			const Vec3f &pointOnLight,
+			const Face *f,
+			const Material *m,
+			const Ray &ray,
+			const Hit &hit) const
+{
+        const Vec3f normal(hit.getNormal());
+
+	Vec3f dirToLight = pointOnLight - point;
+	dirToLight.Normalize();
+	/* If dot product < 0, surface is not facing light */
+	if (normal.Dot3(dirToLight) > 0) {
+		Ray rayToLight(point, dirToLight);
+		Hit hLight;
+		bool blocked = CastRay(rayToLight, hLight, false);
+		while (std::fabs(hLight.getT()) < 0.0000001 &&
+				std::fabs((pointOnLight - point).Length()) > std::numeric_limits<double>::epsilon()) {
+			rayToLight = Ray(rayToLight.pointAtParameter(0.00000001),
+					dirToLight);
+			blocked = CastRay(rayToLight, hLight, false);
+		}
+		RayTree::AddShadowSegment(rayToLight, 0, hLight.getT());
+		if (hLight.getT() == FLT_MAX || hLight.getMaterial() != f->getMaterial()) {
+			return Vec3f(0, 0, 0);
+		}
+
+		const Vec3f lightColor = 0.2 * f->getMaterial()->getEmittedColor() * f->getArea();
+		return m->Shade(ray,hit,dirToLight,lightColor,args);
+	}
+	return Vec3f(0, 0, 0);
 }
