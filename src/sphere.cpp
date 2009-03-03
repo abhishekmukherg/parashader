@@ -32,8 +32,8 @@ bool Sphere::intersect(const Ray &r, Hit &h) const
 	
 	assert(fabs(d) > std::numeric_limits<double>::epsilon());
 
-	const double t0 = (-b + d) / (2 * a);
-	const double t1 = (-b - d) / (2 * a);
+	const double t0 = (-b + sqrt(d)) / (2 * a);
+	const double t1 = (-b - sqrt(d)) / (2 * a);
 	assert(t0 >= t1);
 
 	const double tf = (t1 >= 0) ? t1 : t0;
@@ -44,8 +44,6 @@ bool Sphere::intersect(const Ray &r, Hit &h) const
 	const Vec3f normal(point - center);
 	assert(normal.Length() > 0);
 	h.set(tf, material, normal);
-	h.setTextureCoords(0, 0);
-	/* FIXME: missing setTextureCoordinates */
 	return true;
 } 
 

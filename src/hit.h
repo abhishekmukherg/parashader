@@ -16,21 +16,17 @@ using std::ostream;
 // ====================================================================
 
 class Hit {
-  
+
 public:
 
   // CONSTRUCTOR & DESTRUCTOR
-  Hit() { 
-    t = FLT_MAX;
-    material = NULL;
-    normal = Vec3f(0,0,0); 
-    texture_s = 0;
-    texture_t = 0;
+  Hit() {
+    clear();
   }
-  Hit(const Hit &h) { 
-    t = h.t; 
-    material = h.material; 
-    normal = h.normal; 
+  Hit(const Hit &h) {
+    t = h.t;
+    material = h.material;
+    normal = h.normal;
     texture_s = h.texture_s;
     texture_t = h.texture_t;
   }
@@ -45,14 +41,22 @@ public:
 
   // MODIFIER
   void set(double _t, Material *m, Vec3f n) {
-    t = _t; material = m; normal = n; 
+    t = _t; material = m; normal = n;
     texture_s = 0; texture_t = 0; }
 
   void setTextureCoords(double t_s, double t_t) {
-    texture_s = t_s; texture_t = t_t; 
+    texture_s = t_s; texture_t = t_t;
   }
 
-private: 
+  void clear() {
+	    t = FLT_MAX;
+	    material = NULL;
+	    normal = Vec3f(0,0,0);
+	    texture_s = 0;
+	    texture_t = 0;
+  }
+
+private:
 
   // REPRESENTATION
   double t;
