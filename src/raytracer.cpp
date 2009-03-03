@@ -84,12 +84,15 @@ Vec3f RayTracer::reflections(const Ray &ray, const Hit &hit, int bounce_count) c
 
 	Ray new_ray(point, new_dir);
 	Hit new_hit;
+	/* Non glossy reflections */
 	Vec3f answer = TraceRay(new_ray, new_hit, bounce_count - 1);
 	while (new_hit.getT() < SURFACE_EPSILON) {
 		new_ray = Ray(new_ray.pointAtParameter(SURFACE_EPSILON),
 				new_ray.getDirection());
 		answer = TraceRay(new_ray, new_hit, bounce_count - 1);
 	}
+	RayTree::AddReflectedSegment(new_ray, 0, new_hit.getT());
+	/* Glossy reflections */
 	for (int i = 1; i < args->num_glossy_samples; ++i) {
 		const Vec3f rand_vec(0.5 * (static_cast<double>(rand()) / RAND_MAX),
 				0.5 * (static_cast<double>(rand()) / RAND_MAX),
@@ -97,7 +100,8 @@ Vec3f RayTracer::reflections(const Ray &ray, const Hit &hit, int bounce_count) c
 		Ray gloss_ray(new_ray.getOrigin(),
 				new_ray.getDirection() + rand_vec);
 		Hit gloss_hit;
-		Vec3f gloss_answer = TraceRay(gloss_ray, new_hit, bounce_count - 1);
+		/* Compute reflection */
+		Vec3f gloss_answer = TraceRay(gloss_ray, gloss_hit, bounce_count - 1);
 		while (gloss_hit.getT() < SURFACE_EPSILON) {
 			gloss_ray = Ray(gloss_ray.pointAtParameter(SURFACE_EPSILON),
 					gloss_ray.getDirection());
@@ -109,7 +113,6 @@ Vec3f RayTracer::reflections(const Ray &ray, const Hit &hit, int bounce_count) c
 		RayTree::AddReflectedSegment(gloss_ray, 0, gloss_hit.getT());
 	}
 	answer *= static_cast<double>(1)/(args->num_glossy_samples + 1);
-	RayTree::AddReflectedSegment(new_ray, 0, new_hit.getT());
 	return answer;
 }
 
