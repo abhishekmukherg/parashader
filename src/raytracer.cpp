@@ -7,6 +7,8 @@
 #include "raytree.h"
 #include "ray.h"
 
+static double const SURFACE_EPSILON = 0.000001;
+
 // casts a single ray through the scene geometry and finds the closest hit
 bool RayTracer::CastRay(const Ray &ray, Hit &h, bool use_sphere_patches) const
 {
@@ -33,8 +35,6 @@ bool RayTracer::CastRay(const Ray &ray, Hit &h, bool use_sphere_patches) const
         }
         return answer;
 }
-
-
 
 // does the recursive (shadow rays & recursive/glossy rays) work
 Vec3f RayTracer::TraceRay(const Ray &ray, Hit &hit, int bounce_count) const
@@ -63,17 +63,34 @@ Vec3f RayTracer::TraceRay(const Ray &ray, Hit &hit, int bounce_count) const
                         // add contribution from reflection, if the surface is shiny
                         Vec3f reflectiveColor = m->getReflectiveColor();
                         double roughness = m->getRoughness();
-
-
-                        // ==========================================
-                        // ASSIGNMENT:  ADD REFLECTIVE & GLOSSY LOGIC
-                        // ==========================================
-
-
+                        if (bounce_count > 0) {
+                        	answer += reflectiveColor * reflections(ray, hit, bounce_count);
+                        }
                 }
         }
 
         return answer;
+}
+
+Vec3f RayTracer::reflections(const Ray &ray, const Hit &hit, int bounce_count) const
+{
+	if (bounce_count <= 0)
+		return Vec3f(0, 0, 0);
+	const Vec3f point = ray.pointAtParameter(hit.getT());
+	const Vec3f orig_dir = ray.getDirection();
+	const Vec3f new_dir = orig_dir -
+		2 * new_dir.Dot3(hit.getNormal()) * hit.getNormal();
+
+	Ray new_ray(point, new_dir);
+	Hit new_hit;
+	Vec3f answer = TraceRay(new_ray, new_hit, bounce_count - 1);
+	while (new_hit.getT() < SURFACE_EPSILON) {
+		new_ray = Ray(new_ray.pointAtParameter(SURFACE_EPSILON),
+				new_ray.getDirection());
+		answer = TraceRay(new_ray, new_hit, bounce_count - 1);
+	}
+	RayTree::AddReflectedSegment(new_ray, 0, new_hit.getT());
+	return answer;
 }
 
 Vec3f RayTracer::shadows(const Ray &ray, const Hit &hit, const Material *m) const
@@ -88,8 +105,6 @@ Vec3f RayTracer::shadows(const Ray &ray, const Hit &hit, const Material *m) cons
 
 	        const Vec3f point(ray.pointAtParameter(hit.getT()));
 		answer += shadow(point, pointOnLight, f, m, ray, hit);
-
-
 	}
 	return answer;
 }
@@ -110,9 +125,9 @@ Vec3f RayTracer::shadow(const Vec3f &point,
 		Ray rayToLight(point, dirToLight);
 		Hit hLight;
 		bool blocked = CastRay(rayToLight, hLight, false);
-		while (std::fabs(hLight.getT()) < 0.0000001 &&
-				std::fabs((pointOnLight - point).Length()) > std::numeric_limits<double>::epsilon()) {
-			rayToLight = Ray(rayToLight.pointAtParameter(0.00000001),
+		while (std::fabs(hLight.getT()) < SURFACE_EPSILON &&
+				std::fabs((pointOnLight - point).Length()) > SURFACE_EPSILON) {
+			rayToLight = Ray(rayToLight.pointAtParameter(SURFACE_EPSILON),
 					dirToLight);
 			blocked = CastRay(rayToLight, hLight, false);
 		}

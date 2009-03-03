@@ -58,14 +58,14 @@ void GLCanvas::initialize(ArgParser *_args, Mesh *_mesh, RayTracer *_raytracer, 
   Vec3f camera_position = point_of_interest + Vec3f(0,0,4*max_dim);
   Vec3f up = Vec3f(0,1,0);
   camera = new PerspectiveCamera(camera_position, point_of_interest, up, 20 * M_PI/180.0);
-  
+
   // setup glut stuff
   glutInitWindowSize(args->width, args->height);
   glutInitWindowPosition(100,100);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);
   glutCreateWindow("OpenGL Viewer");
 
-  // basic rendering 
+  // basic rendering
   glEnable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_NORMALIZE);
@@ -74,7 +74,7 @@ void GLCanvas::initialize(ArgParser *_args, Mesh *_mesh, RayTracer *_raytracer, 
   GLfloat ambient[] = { args->ambient_light.r(),
 			args->ambient_light.g(),
 			args->ambient_light.b(), 0 };
-  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient); 
+  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
   glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
   glCullFace(GL_BACK);
@@ -150,10 +150,10 @@ void GLCanvas::display(void) {
 
   glEnable(GL_LIGHTING);
   glEnable(GL_DEPTH_TEST);
-  
+
   glCallList(display_list_index);
-  HandleGLError(); 
-   
+  HandleGLError();
+
   // Swap the back buffer with the front buffer to display
   // the scene
   glutSwapBuffers();
@@ -258,7 +258,7 @@ void GLCanvas::keyboard(unsigned char key, int x, int y) {
     break; }
 
     // RADIOSITY STUFF
-  case ' ': 
+  case ' ':
     // a single step of radiosity
     radiosity->Iterate();
     Render();
@@ -266,7 +266,7 @@ void GLCanvas::keyboard(unsigned char key, int x, int y) {
   case 'a': case 'A':
     // animate radiosity solution
     args->radiosity_animation = !args->radiosity_animation;
-    if (args->radiosity_animation) 
+    if (args->radiosity_animation)
       printf ("radiosity animation started, press 'A' to stop\n");
     else
       printf ("radiosity animation stopped, press 'A' to start\n");
@@ -330,10 +330,10 @@ Vec3f GLCanvas::TraceRay(double i, double j) {
   int max_d = max2(args->width,args->height);
   double x = (i+0.5-args->width/2.0)/double(max_d)+0.5;
   double y = (j+0.5-args->height/2.0)/double(max_d)+0.5;
- 
+
   Ray r = camera->generateRay(Vec2f(x,y));
   Hit hit;
-  Vec3f color = raytracer->TraceRay(r,hit);
+  Vec3f color = raytracer->TraceRay(r,hit,args->num_bounces);
   RayTree::SetMainSegment(r,0,hit.getT());
   return color;
 }
