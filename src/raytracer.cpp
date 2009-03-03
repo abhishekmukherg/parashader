@@ -44,7 +44,6 @@ Vec3f RayTracer::TraceRay(const Ray &ray, Hit &hit, int bounce_count) const
         bool intersect = CastRay(ray,hit,false);
 
         Vec3f answer = args->background_color_linear;
-        const double STD_EPS = std::numeric_limits<double>::epsilon();
 
         if (intersect == true) {
                 const Material *m = hit.getMaterial();
