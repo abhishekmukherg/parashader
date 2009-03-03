@@ -55,7 +55,7 @@ Vec3f Face::RandomPoint() const {
   double s = rand() / double(RAND_MAX);
   double t = rand() / double(RAND_MAX);
 
-  Vec3f answer = s*t*a + s*(1-t)*b + (1-s)*t*c + (1-s)*(1-t)*d;
+  Vec3f answer = s*t*a + s*(1-t)*d + (1-s)*t*b + (1-s)*(1-t)*c;
   return answer;
 }
 
