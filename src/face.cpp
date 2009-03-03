@@ -5,7 +5,7 @@
 #include <iostream>
 
 // =========================================================================
-// utility functions 
+// utility functions
 inline double DistanceBetweenTwoPoints(const Vec3f &p1, const Vec3f &p2) {
   Vec3f v(p1,p2);
   return v.Length();
@@ -35,7 +35,7 @@ double Face::getArea() const {
   Vec3f b = (*this)[1]->get();
   Vec3f c = (*this)[2]->get();
   Vec3f d = (*this)[3]->get();
-  return 
+  return
     AreaOfTriangle(DistanceBetweenTwoPoints(a,b),
                    DistanceBetweenTwoPoints(a,c),
                    DistanceBetweenTwoPoints(b,c)) +
@@ -75,16 +75,16 @@ bool Face::triangle_intersect(const Ray &r, Hit &h, Vertex *a, Vertex *b, Vertex
 
   // compute the intersection with the plane of the triangle
   Hit h2 = Hit(h);
-  if (!plane_intersect(r,h2,intersect_backfacing)) return 0;  
+  if (!plane_intersect(r,h2,intersect_backfacing)) return 0;
 
   // figure out the barycentric coordinates:
   Vec3f Ro = r.getOrigin();
   Vec3f Rd = r.getDirection();
-  // [ ax-bx   ax-cx  Rdx ][ beta  ]     [ ax-Rox ] 
-  // [ ay-by   ay-cy  Rdy ][ gamma ]  =  [ ay-Roy ] 
-  // [ az-bz   az-cz  Rdz ][ t     ]     [ az-Roz ] 
+  // [ ax-bx   ax-cx  Rdx ][ beta  ]     [ ax-Rox ]
+  // [ ay-by   ay-cy  Rdy ][ gamma ]  =  [ ay-Roy ]
+  // [ az-bz   az-cz  Rdz ][ t     ]     [ az-Roz ]
   // solve for beta, gamma, & t using Cramer's rule
-  
+
   double detA = Matrix::det3x3(a->get().x()-b->get().x(),a->get().x()-c->get().x(),Rd.x(),
                               a->get().y()-b->get().y(),a->get().y()-c->get().y(),Rd.y(),
                               a->get().z()-b->get().z(),a->get().z()-c->get().z(),Rd.z());
@@ -95,7 +95,7 @@ bool Face::triangle_intersect(const Ray &r, Hit &h, Vertex *a, Vertex *b, Vertex
   double beta  = Matrix::det3x3(a->get().x()-Ro.x(),a->get().x()-c->get().x(),Rd.x(),
 			       a->get().y()-Ro.y(),a->get().y()-c->get().y(),Rd.y(),
 			       a->get().z()-Ro.z(),a->get().z()-c->get().z(),Rd.z()) / detA;
-  
+
   double gamma = Matrix::det3x3(a->get().x()-b->get().x(),a->get().x()-Ro.x(),Rd.x(),
 			       a->get().y()-b->get().y(),a->get().y()-Ro.y(),Rd.y(),
 			       a->get().z()-b->get().z(),a->get().z()-Ro.z(),Rd.z()) / detA;
@@ -137,7 +137,7 @@ bool Face::plane_intersect(const Ray &r, Hit &h, bool intersect_backfacing) cons
 
   if (denom == 0) return 0;  // parallel to plane
 
-  if (!intersect_backfacing && normal.Dot3(r.getDirection()) >= 0) 
+  if (!intersect_backfacing && normal.Dot3(r.getDirection()) >= 0)
     return 0; // hit the backside
 
   double t = numer / denom;
