@@ -24,13 +24,12 @@ bool Sphere::intersect(const Ray &r, Hit &h) const
 	const double a = dir.Dot3(dir);
 	const double b = 2 * dir.Dot3(ori);
 	const double c = ori.Dot3(ori) - radius * radius;
-	
+
 	const double d = b * b - 4 * a * c;
 
-	if (d < std::numeric_limits<double>::epsilon())
+	if (d < std::numeric_limits<double>::epsilon() ||
+			fabs(d) <= std::numeric_limits<double>::epsilon())
 		return false;
-	
-	assert(fabs(d) > std::numeric_limits<double>::epsilon());
 
 	const double t0 = (-b + sqrt(d)) / (2 * a);
 	const double t1 = (-b - sqrt(d)) / (2 * a);
@@ -45,7 +44,7 @@ bool Sphere::intersect(const Ray &r, Hit &h) const
 	assert(normal.Length() > 0);
 	h.set(tf, material, normal);
 	return true;
-} 
+}
 
 // ====================================================================
 // ====================================================================
