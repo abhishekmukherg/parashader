@@ -39,7 +39,7 @@ private:
 
 	Vec3f shadows(const Ray &ray, const Hit &hit, const Material *m) const;
 	Vec3f shadow(const Vec3f &point, const Vec3f &pointOnLight, const Face *f, const Material *m, const Ray &ray, const Hit &hit) const;
-	Vec3f reflections(const Ray &ray, const Hit &hit, int bounce_count) const;
+	Vec3f reflections(const Ray &ray, const Hit &hit, int bounce_count, double roughness) const;
 
         RayTracer() {
                 assert(0);    // don't use this

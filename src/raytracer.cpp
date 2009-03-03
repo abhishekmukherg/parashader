@@ -64,7 +64,7 @@ Vec3f RayTracer::TraceRay(const Ray &ray, Hit &hit, int bounce_count) const
                         Vec3f reflectiveColor = m->getReflectiveColor();
                         double roughness = m->getRoughness();
                         if (bounce_count > 0 && reflectiveColor.Length() > MIN_COLOR_LEN) {
-                        	answer += reflectiveColor * reflections(ray, hit, bounce_count);
+                        	answer += reflectiveColor * reflections(ray, hit, bounce_count, roughness);
                         }
                 }
         }
@@ -72,7 +72,7 @@ Vec3f RayTracer::TraceRay(const Ray &ray, Hit &hit, int bounce_count) const
         return answer;
 }
 
-Vec3f RayTracer::reflections(const Ray &ray, const Hit &hit, int bounce_count) const
+Vec3f RayTracer::reflections(const Ray &ray, const Hit &hit, int bounce_count, double roughness) const
 {
 	if (bounce_count <= 0)
 		return Vec3f(0, 0, 0);
@@ -94,9 +94,10 @@ Vec3f RayTracer::reflections(const Ray &ray, const Hit &hit, int bounce_count) c
 	RayTree::AddReflectedSegment(new_ray, 0, new_hit.getT());
 	/* Glossy reflections */
 	for (int i = 1; i < args->num_glossy_samples; ++i) {
-		const Vec3f rand_vec(0.5 * (static_cast<double>(rand()) / RAND_MAX),
-				0.5 * (static_cast<double>(rand()) / RAND_MAX),
-				0.5 * (static_cast<double>(rand()) / RAND_MAX));
+		/* Getting gloss ray */
+		const Vec3f rand_vec(roughness * (static_cast<double>(rand()) / RAND_MAX),
+				roughness * (static_cast<double>(rand()) / RAND_MAX),
+				roughness * (static_cast<double>(rand()) / RAND_MAX));
 		Ray gloss_ray(new_ray.getOrigin(),
 				new_ray.getDirection() + rand_vec);
 		Hit gloss_hit;
