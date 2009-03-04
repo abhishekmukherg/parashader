@@ -44,11 +44,11 @@ public:
   Vec3f getRadiance(int i) const {
     assert (i >= 0 && i < num_faces);
     return radiance[i]; }
-  
+
   // =========
   // MODIFIERS
   double Iterate();
-  void setFormFactor(int i, int j, double value) { 
+  void setFormFactor(int i, int j, double value) {
     assert (i >= 0 && i < num_faces);
     assert (j >= 0 && j < num_faces);
     assert (formfactors != NULL);
@@ -64,14 +64,14 @@ public:
   void setArea(int i, double value) {
     assert (i >= 0 && i < num_faces);
     area[i] = value; }
-  void setUndistributed(int i, Vec3f value) { 
+  void setUndistributed(int i, Vec3f value) {
     assert (i >= 0 && i < num_faces);
     undistributed[i] = value; }
   void findMaxUndistributed();
-  void setAbsorbed(int i, Vec3f value) { 
+  void setAbsorbed(int i, Vec3f value) {
     assert (i >= 0 && i < num_faces);
     absorbed[i] = value; }
-  void setRadiance(int i, Vec3f value) { 
+  void setRadiance(int i, Vec3f value) {
     assert (i >= 0 && i < num_faces);
     radiance[i] = value; }
 
@@ -83,6 +83,8 @@ public:
   void insertColor(Vec3f v);
 
 private:
+
+  double form_factor(const Face *f_i, const Face *f_j) const;
 
   // ==============
   // REPRESENTATION

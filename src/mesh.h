@@ -28,7 +28,7 @@ public:
   Mesh();
   virtual ~Mesh();
   void Load(const char *input_file, ArgParser *_args);
-    
+
   // ========
   // VERTICES
   int numVertices() const { return vertices.size(); }

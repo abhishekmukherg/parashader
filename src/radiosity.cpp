@@ -1,10 +1,14 @@
 #include "radiosity.h"
 #include "mesh.h"
 #include "face.h"
-#include "glCanvas.h"
-#include "sphere.h"
-#include "raytree.h"
 #include "raytracer.h"
+#include "glCanvas.h"
+
+#include <cmath>
+#ifndef M_PI
+#warning Using more imprecise version of PI
+#define M_PI 3.1415
+#endif
 
 // Included files for OpenGL Rendering
 #ifdef __APPLE__
@@ -17,6 +21,9 @@
 #include <GL/glut.h>
 #endif
 
+static const int NUM_RAYS = 32;
+static const double FACE_EPSILON = 0.000001;
+
 void CollectFacesWithVertex(Vertex *have, Face *f, vector<Face*> &faces);
 
 // ================================================================
@@ -25,7 +32,7 @@ void CollectFacesWithVertex(Vertex *have, Face *f, vector<Face*> &faces);
 Radiosity::Radiosity(Mesh *m, ArgParser *a) {
   mesh = m;
   args = a;
-  num_faces = -1;  
+  num_faces = -1;
   formfactors = NULL;
   area = NULL;
   undistributed = NULL;
@@ -84,7 +91,7 @@ void Radiosity::Reset() {
 
 
 void Radiosity::findMaxUndistributed() {
-  // find the patch with the most undistributed energy 
+  // find the patch with the most undistributed energy
   // don't forget that the patches may have different sizes!
   max_undistributed_patch = -1;
   total_undistributed = 0;
@@ -103,27 +110,54 @@ void Radiosity::findMaxUndistributed() {
 }
 
 
-void Radiosity::ComputeFormFactors() {
-  assert (formfactors == NULL);
-  assert (num_faces > 0);
-  formfactors = new double[num_faces*num_faces];
+void Radiosity::ComputeFormFactors()
+{
+	assert(formfactors == NULL);
+	assert(num_faces > 0);
+	formfactors = new double[num_faces * num_faces];
 
+	for (int i = 0; i < num_faces; ++i) {
+		const Face *f_i(mesh->getFace(i));
+		for (int j = 0; j < num_faces; ++j) {
+			const Face *f_j(mesh->getFace(j));
+			formfactors[i + j * num_faces] = form_factor(f_i, f_j);
+			std::cout << formfactors[i + j * num_faces] << std::endl;
+		}
+	}
+}
 
+double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
+{
+	double value = 0;
+	for (int i = 0; i < NUM_RAYS; ++i) {
+		/* Get sample points */
+		const Vec3f p_i(f_i->RandomPoint());
+		const Vec3f p_j(f_j->RandomPoint());
+		/* Connecting vector */
+		Vec3f p_ij(p_j - p_i);
 
-  // =====================================
-  // ASSIGNMENT:  COMPUTE THE FORM FACTORS
-  // =====================================
+		const double ctheta_i(p_ij.CosAngleBetween(f_i->computeNormal()));
+		const double ctheta_j(p_ij.CosAngleBetween(f_j->computeNormal()));
+		if (ctheta_i < 0 || ctheta_j < 0)
+			continue;
 
-
-
-
+		p_ij.Normalize();
+		Hit h;
+		const Ray ray(p_i + (p_ij * FACE_EPSILON), p_ij);
+		raytracer->CastRay(ray, h, false);
+		/* Calculate the cosine of theta */
+		const double len = p_ij.Length();
+		if (h.getMaterial() == f_j->getMaterial())
+			value += (ctheta_i * ctheta_j) / (M_PI * len * len);
+	}
+	return value / NUM_RAYS;
 }
 
 // ================================================================
 // ================================================================
 
 double Radiosity::Iterate() {
-  if (formfactors == NULL) 
+  if (formfactors == NULL)
     ComputeFormFactors();
   assert (formfactors != NULL);
 
@@ -150,7 +184,7 @@ Vec3f Radiosity::whichVisualization(enum RENDER_MODE mode, Face *f, int i) {
   assert (i >= 0 && i < num_faces);
   if (mode == RENDER_LIGHTS) {
     return f->getMaterial()->getEmittedColor();
-  } else if (mode == RENDER_UNDISTRIBUTED) { 
+  } else if (mode == RENDER_UNDISTRIBUTED) {
     return getUndistributed(i);
   } else if (mode == RENDER_ABSORBED) {
     return getAbsorbed(i);
@@ -219,7 +253,7 @@ void Radiosity::Paint(ArgParser *args) {
   // the edges will always win.
   glEnable(GL_POLYGON_OFFSET_FILL);
   glPolygonOffset(1.1,4.0);
-  
+
   if (args->render_mode == RENDER_MATERIALS) {
     // draw the faces with OpenGL lighting, just to understand the geometry
     // (the GL light has nothing to do with the surfaces that emit light!)
@@ -248,16 +282,16 @@ void Radiosity::Paint(ArgParser *args) {
 	glColor3f(1,1,1);
 	glBindTexture(GL_TEXTURE_2D,m->getTextureID());
 	glBegin (GL_QUADS);
-	glTexCoord2d((*f)[0]->get_s(),(*f)[0]->get_t()); 
+	glTexCoord2d((*f)[0]->get_s(),(*f)[0]->get_t());
 	glVertex3f(a.x(),a.y(),a.z());
-	glTexCoord2d((*f)[1]->get_s(),(*f)[1]->get_t()); 
+	glTexCoord2d((*f)[1]->get_s(),(*f)[1]->get_t());
 	glVertex3f(b.x(),b.y(),b.z());
-	glTexCoord2d((*f)[2]->get_s(),(*f)[2]->get_t()); 
+	glTexCoord2d((*f)[2]->get_s(),(*f)[2]->get_t());
 	glVertex3f(c.x(),c.y(),c.z());
-	glTexCoord2d((*f)[3]->get_s(),(*f)[3]->get_t()); 
+	glTexCoord2d((*f)[3]->get_s(),(*f)[3]->get_t());
 	glVertex3f(d.x(),d.y(),d.z());
 	glEnd();
-	glDisable(GL_TEXTURE_2D);	
+	glDisable(GL_TEXTURE_2D);
       }
     }
   } else if (args->render_mode == RENDER_RADIANCE && args->interpolate == true) {
@@ -316,20 +350,20 @@ void Radiosity::Paint(ArgParser *args) {
     glVertex3f(a.x(),a.y(),a.z());
     glVertex3f(b.x(),b.y(),b.z());
     glVertex3f(b.x(),b.y(),b.z());
-    glVertex3f(c.x(),c.y(),c.z());    
-    glVertex3f(c.x(),c.y(),c.z());    
-    glVertex3f(d.x(),d.y(),d.z());    
-    glVertex3f(d.x(),d.y(),d.z());    
+    glVertex3f(c.x(),c.y(),c.z());
+    glVertex3f(c.x(),c.y(),c.z());
+    glVertex3f(d.x(),d.y(),d.z());
+    glVertex3f(d.x(),d.y(),d.z());
     glVertex3f(a.x(),a.y(),a.z());
     glEnd();
     glEnable(GL_LIGHTING);
   }
 
-  glDisable(GL_POLYGON_OFFSET_FILL); 
-  HandleGLError(); 
-  
+  glDisable(GL_POLYGON_OFFSET_FILL);
+  HandleGLError();
+
   if (args->wireframe) {
-    mesh->PaintWireframe(); 
+    mesh->PaintWireframe();
   }
 }
 

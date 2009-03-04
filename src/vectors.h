@@ -39,13 +39,13 @@ public:
   void Get(double &d0, double &d1) const {
     d0 = data[0];
     d1 = data[1]; }
-  double operator[](int i) const { 
-    assert (i >= 0 && i < 2); 
+  double operator[](int i) const {
+    assert (i >= 0 && i < 2);
     return data[i]; }
   double x() const { return data[0]; }
   double y() const { return data[1]; }
   double Length() const {
-    return (double)sqrt( data[0] * data[0] + 
+    return (double)sqrt( data[0] * data[0] +
 			data[1] * data[1] ); }
 
   // MODIFIERS
@@ -89,7 +89,7 @@ public:
     data[0] /= f;
     data[1] /= f;
     return *this; }
-  
+
   // OPERATIONS
   double Dot2(const Vec2f &V) const {
     return data[0] * V.data[0] + data[1] * V.data[1] ; }
@@ -123,7 +123,7 @@ private:
 
   // REPRESENTATION
   double		data[2];
-  
+
 };
 // ====================================================================
 // ====================================================================
@@ -153,8 +153,8 @@ public:
     d0 = data[0];
     d1 = data[1];
     d2 = data[2]; }
-  double operator[](int i) const { 
-    assert (i >= 0 && i < 3); 
+  double operator[](int i) const {
+    assert (i >= 0 && i < 3);
     return data[i]; }
   double x() const { return data[0]; }
   double y() const { return data[1]; }
@@ -197,6 +197,10 @@ public:
     if (data[0] < low) data[0] = low;  if (data[0] > high) data[0] = high;
     if (data[1] < low) data[1] = low;  if (data[1] > high) data[1] = high;
     if (data[2] < low) data[2] = low;  if (data[2] > high) data[2] = high; }
+  double CosAngleBetween(const Vec3f &v) {
+	  return Dot3(v) /
+	  (Length() * v.Length());
+  }
 
   // OVERLOADED OPERATORS
   Vec3f& operator=(const Vec3f &V) {
@@ -242,20 +246,20 @@ public:
     data[1] /= f;
     data[2] /= f;
     return *this; }
-  
-  friend Vec3f operator+(const Vec3f &v1, const Vec3f &v2) { 
-    Vec3f v3; Add(v3,v1,v2); return v3; } 
+
+  friend Vec3f operator+(const Vec3f &v1, const Vec3f &v2) {
+    Vec3f v3; Add(v3,v1,v2); return v3; }
   friend Vec3f operator-(const Vec3f &v1) {
     Vec3f v3 = v1; v3.Negate(); return v3; }
   friend Vec3f operator-(const Vec3f &v1, const Vec3f &v2) {
-    Vec3f v3; Sub(v3,v1,v2); return v3; } 
+    Vec3f v3; Sub(v3,v1,v2); return v3; }
   friend Vec3f operator*(const Vec3f &v1, double f) {
-    Vec3f v2; CopyScale(v2,v1,f); return v2; } 
+    Vec3f v2; CopyScale(v2,v1,f); return v2; }
   friend Vec3f operator*(double f, const Vec3f &v1) {
-    Vec3f v2; CopyScale(v2,v1,f); return v2; } 
+    Vec3f v2; CopyScale(v2,v1,f); return v2; }
   friend Vec3f operator*(const Vec3f &v1, const Vec3f &v2) {
     Vec3f v3; Mult(v3,v1,v2); return v3; }
-         
+
   // OPERATIONS
   double Dot3(const Vec3f &V) const {
     return data[0] * V.data[0] +
@@ -305,29 +309,29 @@ public:
     a.data[0] = (b.data[0] > c.data[0]) ? b.data[0] : c.data[0];
     a.data[1] = (b.data[1] > c.data[1]) ? b.data[1] : c.data[1];
     a.data[2] = (b.data[2] > c.data[2]) ? b.data[2] : c.data[2]; }
-  
+
   // INPUT / OUTPUT
   friend ostream& operator<< (ostream &ostr, const Vec3f &v) {
-    ostr << v.data[0] << " " << v.data[1] << " " << v.data[2] << endl; 
+    ostr << v.data[0] << " " << v.data[1] << " " << v.data[2] << endl;
     return ostr; }
   friend istream& operator>> (istream &istr, Vec3f &v) {
     istr >> v.data[0] >> v.data[1] >> v.data[2];
     return istr; }
-  
+
 private:
 
   friend class Matrix;
 
   // REPRESENTATION
   double		data[3];
-  
+
 };
 
 // ====================================================================
 // ====================================================================
 
 class Vec4f {
-  
+
 public:
 
   // CONSTRUCTORS & DESTRUCTOR
@@ -360,8 +364,8 @@ public:
     d1 = data[1];
     d2 = data[2];
     d3 = data[3]; }
-  double operator[](int i) const { 
-    assert (i >= 0 && i < 4); 
+  double operator[](int i) const {
+    assert (i >= 0 && i < 4);
     return data[i]; }
   double x() const { return data[0]; }
   double y() const { return data[1]; }
@@ -468,7 +472,7 @@ public:
       data[1] * V.data[1] +
       data[2] * V.data[2] +
       data[3] * V.data[3]; }
-  
+
   // STATIC OPERATIONS
   static void Add(Vec4f &a, const Vec4f &b, const Vec4f &c ) {
     a.data[0] = b.data[0] + c.data[0];
@@ -508,7 +512,7 @@ public:
 
   // INPUT / OUTPUT
   friend ostream& operator<< (ostream &ostr, const Vec4f &v) {
-    ostr << v.data[0] << " " << v.data[1] << " " << v.data[2] << " " << v.data[3] << endl; 
+    ostr << v.data[0] << " " << v.data[1] << " " << v.data[2] << " " << v.data[3] << endl;
     return ostr; }
 
 private:
@@ -517,7 +521,7 @@ private:
 
   // REPRESENTATION
   double		data[4];
-  
+
 };
 
 // ====================================================================
