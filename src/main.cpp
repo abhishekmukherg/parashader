@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
   radiosity->setRayTracer(raytracer);
 
   GLCanvas glcanvas;
-  glcanvas.initialize(args,mesh,raytracer,radiosity); 
+  glcanvas.initialize(args,mesh,raytracer,radiosity);
 
   // well it never returns from the GLCanvas loop...
   delete args;

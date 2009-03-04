@@ -1,11 +1,11 @@
-#include <cmath>
-
 #include "raytracer.h"
 #include "mesh.h"
 #include "face.h"
 #include "sphere.h"
 #include "raytree.h"
 #include "ray.h"
+
+#include <cmath>
 
 static double const SURFACE_EPSILON = 0.000000001;
 static double const MIN_COLOR_LEN = 0.00000001;
@@ -57,7 +57,7 @@ Vec3f RayTracer::TraceRay(const Ray &ray, Hit &hit, int bounce_count) const
                         answer = args->ambient_light_linear *
                                  m->getDiffuseColor(hit.get_s(),hit.get_t());
                         // Shadows
-                        answer += shadows(ray, hit, m);
+                        answer += shadows(ray, hit);
 
                         // Reflections
                         Vec3f reflectiveColor = m->getReflectiveColor();
@@ -116,30 +116,44 @@ Vec3f RayTracer::reflections(const Ray &ray, const Hit &hit, int bounce_count, d
 	return answer;
 }
 
-Vec3f RayTracer::shadows(const Ray &ray, const Hit &hit, const Material *m) const
+Vec3f RayTracer::shadows(const Ray &ray, const Hit &hit) const
 {
-	Vec3f answer(0,0,0);
+	Vec3f answer(0, 0, 0);
 	// ----------------------------------------------
 	// add contributions from each light that is not in shadow
 	const int num_lights = mesh->getLights().size();
+
 	for (int i = 0; i < num_lights; i++) {
 		const Face *f = mesh->getLights()[i];
-		const Vec3f pointOnLight = f->computeCentroid();
+		Vec3f pointOnLight = f->computeCentroid();
+		const Vec3f point(ray.pointAtParameter(hit.getT()));
 
-	        const Vec3f point(ray.pointAtParameter(hit.getT()));
-		answer += shadow(point, pointOnLight, f, m, ray, hit);
+		double answerx = 0, answery = 0, answerz = 0;
+#pragma omp parallel shared(answerx,answery,answerz)
+		{
+#pragma omp for private(pointOnLight) reduction(+:answerx,answery,answerz)
+			for (int s = 0; s < args->num_shadow_samples; ++s) {
+				const Vec3f sh = shadow(point, pointOnLight, f, ray, hit);
+				answerx += sh.x();
+				answery += sh.x();
+				answerz += sh.x();
+				pointOnLight = f->RandomPoint();
+			}
+		}
+		answer += Vec3f(answerx, answery, answerz);
 	}
+	answer *= static_cast<double>(1) / args->num_shadow_samples * num_lights;
 	return answer;
 }
 
 Vec3f RayTracer::shadow(const Vec3f &point,
 			const Vec3f &pointOnLight,
 			const Face *f,
-			const Material *m,
 			const Ray &ray,
 			const Hit &hit) const
 {
         const Vec3f normal(hit.getNormal());
+        const Material *m = hit.getMaterial();
 
 	Vec3f dirToLight = pointOnLight - point;
 	dirToLight.Normalize();
