@@ -156,22 +156,33 @@ double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
 // ================================================================
 // ================================================================
 
-double Radiosity::Iterate() {
-  if (formfactors == NULL)
-    ComputeFormFactors();
-  assert (formfactors != NULL);
+double Radiosity::Iterate()
+{
+	if (formfactors == NULL)
+		ComputeFormFactors();
+	assert(formfactors != NULL);
 
+	Vec3f *answers = new Vec3f[num_faces];
+	for (int i = 0; i < num_faces; ++i) {
+		const double *f = &formfactors[i * num_faces];
+		Vec3f answer(0, 0, 0);
+		for (int j = 0; j < num_faces; ++j) {
+			answer += radiance[j] * f[j] +
+				mesh->getFace(i)->getMaterial()->getEmittedColor();
+			++f;
+			assert(mesh->getFace(i)->getRadiosityPatchIndex() == i);
+		}
+		answers[i] = answer;
+	}
 
+	for(int i = 0; i < num_faces; ++i) {
+		radiance[i] = answers[i];
+	}
+	delete[] answers;
 
-  // ==========================================
-  // ASSIGNMENT:  IMPLEMENT RADIOSITY ALGORITHM
-  // ==========================================
-
-
-
-  // fix this: return the total light yet undistributed
-  // (so we can decide when the solution has sufficiently converged)
-  return 0;
+	// fix this: return the total light yet undistributed
+	// (so we can decide when the solution has sufficiently converged)
+	return 0;
 
 }
 
