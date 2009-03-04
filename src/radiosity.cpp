@@ -148,9 +148,11 @@ double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
 		/* Calculate the cosine of theta */
 		const double len = p_ij.Length();
 		if (h.getMaterial() == f_j->getMaterial())
-			value += (ctheta_i * ctheta_j) / (M_PI * len * len);
+			value += (ctheta_i * ctheta_j) / (len * len);
 	}
-	return value / NUM_RAYS;
+	value = value * f_i->getArea() / (NUM_RAYS * M_PI);
+	assert(value >= 0);
+	return value * f_i->getArea() / (NUM_RAYS * M_PI);
 }
 
 // ================================================================
