@@ -43,7 +43,7 @@ Vec3f RayTracer::TraceRay(const Ray &ray, Hit &hit, int bounce_count) const
         hit = Hit();
         bool intersect = CastRay(ray,hit,false);
 
-        Vec3f answer = args->background_color_linear;
+        Vec3f answer(args->background_color_linear);
 
         if (intersect == true) {
                 const Material *m = hit.getMaterial();
@@ -56,6 +56,7 @@ Vec3f RayTracer::TraceRay(const Ray &ray, Hit &hit, int bounce_count) const
                         // ambient light
                         answer = args->ambient_light_linear *
                                  m->getDiffuseColor(hit.get_s(),hit.get_t());
+
                         // Shadows
                         answer += shadows(ray, hit);
 
@@ -76,49 +77,62 @@ Vec3f RayTracer::reflections(const Ray &ray, const Hit &hit, int bounce_count, d
 	if (bounce_count <= 0)
 		return Vec3f(0, 0, 0);
 	const Vec3f point = ray.pointAtParameter(hit.getT());
+
+	/* Get mirror direction */
 	const Vec3f orig_dir = ray.getDirection();
 	Vec3f norm = hit.getNormal();
 	norm.Normalize();
 	const Vec3f new_dir = orig_dir - 2 * orig_dir.Dot3(norm) * norm;
 
-	Ray new_ray(point, new_dir);
-	Hit new_hit;
-	/* Non glossy reflections */
-	Vec3f answer = TraceRay(new_ray, new_hit, bounce_count - 1);
-	while (new_hit.getT() < SURFACE_EPSILON) {
-		new_ray = Ray(new_ray.pointAtParameter(SURFACE_EPSILON),
-				new_ray.getDirection());
-		answer = TraceRay(new_ray, new_hit, bounce_count - 1);
-	}
-	RayTree::AddReflectedSegment(new_ray, 0, new_hit.getT());
-	/* Glossy reflections */
-	for (int i = 1; i < args->num_glossy_samples; ++i) {
-		/* Getting gloss ray */
-		const Vec3f rand_vec(roughness * (static_cast<double>(rand()) / RAND_MAX),
+	const Ray new_ray(point, new_dir);
+	Vec3f rand_vec(0, 0, 0);
+	double answerx = 0, answery = 0, answerz = 0;
+	/* sphere projection, what if the center of the sphere misses the
+	 * object?
+	 */
+
+//#pragma omp parallel shared(answerx,answery,answerz)
+	{
+//#pragma omp for private(rand_vec) reduction(+:answerx,answery,answerz)
+		for (int i = 0; i <= args->num_glossy_samples; ++i) {
+			/* Getting gloss ray */
+			Ray start_ray(new_ray.getOrigin(),
+					new_ray.getDirection() + rand_vec);
+			const Vec3f answer(reflection(start_ray, bounce_count - 1));
+
+			answerx += answer.x();
+			answery += answer.y();
+			answerz += answer.z();
+			rand_vec = Vec3f(roughness * (static_cast<double>(rand()) / RAND_MAX),
 				roughness * (static_cast<double>(rand()) / RAND_MAX),
 				roughness * (static_cast<double>(rand()) / RAND_MAX));
-		Ray gloss_ray(new_ray.getOrigin(),
-				new_ray.getDirection() + rand_vec);
-		Hit gloss_hit;
-		/* Compute reflection */
-		Vec3f gloss_answer = TraceRay(gloss_ray, gloss_hit, bounce_count - 1);
-		while (gloss_hit.getT() < SURFACE_EPSILON) {
-			gloss_ray = Ray(gloss_ray.pointAtParameter(SURFACE_EPSILON),
-					gloss_ray.getDirection());
-			gloss_answer = TraceRay(gloss_ray,
-					gloss_hit,
-					bounce_count - 1);
 		}
-		answer += gloss_answer;
-		RayTree::AddReflectedSegment(gloss_ray, 0, gloss_hit.getT());
 	}
+	Vec3f answer = Vec3f(answerx, answery, answerz);
 	answer *= static_cast<double>(1)/(args->num_glossy_samples + 1);
+	return answer;
+}
+
+Vec3f RayTracer::reflection(const Ray &start_ray, int bounce_count) const
+{
+	Ray ray(start_ray);
+	Hit h;
+	Vec3f answer = TraceRay(ray, h, bounce_count);
+	while (h.getT() < SURFACE_EPSILON) {
+		ray = Ray(ray.pointAtParameter(SURFACE_EPSILON),
+				ray.getDirection());
+		answer = TraceRay(ray, h, bounce_count);
+	}
+	RayTree::AddReflectedSegment(ray, 0, h.getT());
 	return answer;
 }
 
 Vec3f RayTracer::shadows(const Ray &ray, const Hit &hit) const
 {
 	Vec3f answer(0, 0, 0);
+	if (args->num_shadow_samples == 0)
+		return answer;
+
 	// ----------------------------------------------
 	// add contributions from each light that is not in shadow
 	const int num_lights = mesh->getLights().size();
@@ -132,7 +146,7 @@ Vec3f RayTracer::shadows(const Ray &ray, const Hit &hit) const
 #pragma omp parallel shared(answerx,answery,answerz)
 		{
 #pragma omp for private(pointOnLight) reduction(+:answerx,answery,answerz)
-			for (int s = 0; s < args->num_shadow_samples; ++s) {
+			for (int s = 0; s <= args->num_shadow_samples; ++s) {
 				const Vec3f sh = shadow(point, pointOnLight, f, ray, hit);
 				answerx += sh.x();
 				answery += sh.x();
@@ -142,7 +156,7 @@ Vec3f RayTracer::shadows(const Ray &ray, const Hit &hit) const
 		}
 		answer += Vec3f(answerx, answery, answerz);
 	}
-	answer *= static_cast<double>(1) / args->num_shadow_samples * num_lights;
+	answer *= static_cast<double>(1) / ((args->num_shadow_samples + 1) * num_lights);
 	return answer;
 }
 
@@ -168,6 +182,7 @@ Vec3f RayTracer::shadow(const Vec3f &point,
 					dirToLight);
 			blocked = CastRay(rayToLight, hLight, false);
 		}
+#pragma omp critical
 		RayTree::AddShadowSegment(rayToLight, 0, hLight.getT());
 		if (hLight.getT() == FLT_MAX || hLight.getMaterial() != f->getMaterial()) {
 			return Vec3f(0, 0, 0);
