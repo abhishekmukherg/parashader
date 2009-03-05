@@ -91,9 +91,9 @@ Vec3f RayTracer::reflections(const Ray &ray, const Hit &hit, int bounce_count, d
 	 * object?
 	 */
 
-//#pragma omp parallel shared(answerx,answery,answerz)
+#pragma omp parallel shared(answerx,answery,answerz)
 	{
-//#pragma omp for private(rand_vec) reduction(+:answerx,answery,answerz)
+#pragma omp for private(rand_vec) reduction(+:answerx,answery,answerz)
 		for (int i = 0; i <= args->num_glossy_samples; ++i) {
 			/* Getting gloss ray */
 			Ray start_ray(new_ray.getOrigin(),
@@ -130,12 +130,23 @@ Vec3f RayTracer::reflection(const Ray &start_ray, int bounce_count) const
 Vec3f RayTracer::shadows(const Ray &ray, const Hit &hit) const
 {
 	Vec3f answer(0, 0, 0);
-	if (args->num_shadow_samples == 0)
-		return answer;
+
+	const int num_lights = mesh->getLights().size();
+	if (args->num_shadow_samples == 0) {
+		for (int i = 0; i < num_lights; ++i) {
+
+			const Face *f = mesh->getLights()[i];
+			Vec3f pointOnLight = f->computeCentroid();
+			const Vec3f point(ray.pointAtParameter(hit.getT()));
+			Vec3f dirToLight = pointOnLight - point;
+			dirToLight.Normalize();
+			const Vec3f lightColor = 0.2 * f->getMaterial()->getEmittedColor() * f->getArea();
+			return hit.getMaterial()->Shade(ray,hit,dirToLight,lightColor,args);
+		}
+	}
 
 	// ----------------------------------------------
 	// add contributions from each light that is not in shadow
-	const int num_lights = mesh->getLights().size();
 
 	for (int i = 0; i < num_lights; i++) {
 		const Face *f = mesh->getLights()[i];
