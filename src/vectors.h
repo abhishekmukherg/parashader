@@ -197,7 +197,7 @@ public:
     if (data[0] < low) data[0] = low;  if (data[0] > high) data[0] = high;
     if (data[1] < low) data[1] = low;  if (data[1] > high) data[1] = high;
     if (data[2] < low) data[2] = low;  if (data[2] > high) data[2] = high; }
-  double CosAngleBetween(const Vec3f &v) {
+  double CosAngleBetween(const Vec3f &v) const {
 	  return Dot3(v) /
 	  (Length() * v.Length());
   }

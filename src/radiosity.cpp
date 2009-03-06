@@ -145,24 +145,23 @@ double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
 		const Vec3f p_j(f_j->RandomPoint());
 
 		/* Connecting vector */
-		Vec3f p_ij(p_j - p_i);
+		Vec3f p_ji(p_i - p_j);
+		p_ji.Normalize();
+		const Vec3f p_ij(p_ji * -1);
 		/* Angle between vector and normals of faces */
 		const double ctheta_i(p_ij.CosAngleBetween(n_i));
-		p_ij.Negate();
-		const double ctheta_j(p_ij.CosAngleBetween(n_j));
-		p_ij.Negate();
+		const double ctheta_j(p_ji.CosAngleBetween(n_j));
 		/* Obtruse angles -> visibility is 0 */
 		if (ctheta_i < 0 || ctheta_j < 0)
 			continue;
 
-		p_ij.Normalize();
 		Hit h;
 		/* Make sure the view is not obstructed */
 		const Ray ray(p_i + (p_ij * FACE_EPSILON), p_ij);
 		const bool intersect = raytracer->CastRay(ray, h, false);
 
 		if (intersect && h.getMaterial() == f_j->getMaterial()) {
-			const double len = p_ij.Length();
+			const double len = (p_j - p_i).Length();
 			value += (ctheta_i * ctheta_j) / (len * len);
 		}
 	}
@@ -183,11 +182,10 @@ double Radiosity::Iterate()
 	const int max_und = max_undistributed_patch;
 	const Vec3f face_rad(getRadiance(max_und));
 	for (int i = 0; i < num_faces; ++i) {
-		const Vec3f new_r(getFormFactor(max_und, i) * getRadiance(max_und)
+		const Vec3f new_r(getMesh()->getFace(i)->getMaterial()->getDiffuseColor() * getFormFactor(max_und, i) * getRadiance(max_und)
 				+ getMesh()->getFace(i)->getMaterial()->getEmittedColor());
 		setRadiance(i, new_r);
 		setAbsorbed(i, getAbsorbed(i) + new_r);
-
 	}
 	setUndistributed(max_und, Vec3f(0,0,0));
 	findMaxUndistributed();
