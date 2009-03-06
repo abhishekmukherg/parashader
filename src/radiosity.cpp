@@ -4,7 +4,7 @@
 #include "raytracer.h"
 #include "glCanvas.h"
 
-#include <cmath>
+#include <math.h>
 #ifndef M_PI
 #warning Using more imprecise version of PI
 static const double M_PI = 3.1415;
@@ -21,7 +21,7 @@ static const double M_PI = 3.1415;
 #include <GL/glut.h>
 #endif
 
-static const int NUM_RAYS = 4;
+static const int NUM_RAYS = 32;
 static const double FACE_EPSILON = 0.000001;
 
 void CollectFacesWithVertex(Vertex *have, Face *f, vector<Face*> &faces);
@@ -180,17 +180,20 @@ double Radiosity::Iterate()
 		ComputeFormFactors();
 	assert(formfactors != NULL);
 
-	const int max_und = max_undistributed_patch;
-	const Vec3f face_rad(getRadiance(max_und));
+	Vec3f *answers = new Vec3f[num_faces];
 	for (int i = 0; i < num_faces; ++i) {
-		const Vec3f new_r(getMesh()->getFace(i)->getMaterial()->getDiffuseColor() * getFormFactor(max_und, i) * face_rad
-				+ getMesh()->getFace(i)->getMaterial()->getEmittedColor());
-		setRadiance(i, new_r);
-		setAbsorbed(i, getAbsorbed(i) + new_r);
+		Vec3f value(0, 0, 0);
+		for (int j = 0; j < num_faces; ++j) {
+			value += getMesh()->getFace(i)->getMaterial()->getDiffuseColor() *
+				getFormFactor(i, j) * getRadiance(j);
+		}
+		value += getMesh()->getFace(i)->getMaterial()->getEmittedColor();
+		answers[i] = value;
 	}
-	setUndistributed(max_und, Vec3f(0,0,0));
-	findMaxUndistributed();
-
+	for (int i = 0; i < num_faces; ++i) {
+		setRadiance(i, answers[i]);
+	}
+	delete[] answers;
 
 	std::cout << "[";
 	std::cout << "<" << undistributed[0].x() << "," << undistributed[0].y() <<
