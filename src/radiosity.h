@@ -105,6 +105,20 @@ public:
 		assert(i >= 0 && i < num_faces);
 		radiance[i] = value;
 	}
+	void setVisibility(int i, int j, double v)
+	{
+		assert(i >= 0 && i < num_faces);
+		assert(j >= 0 && j < num_faces);
+		assert(visibilities != NULL);
+		visibilities[i * num_faces + j] = v;
+	}
+	double getVisibility(int i, int j) const
+	{
+		assert(i >= 0 && i < num_faces);
+		assert(j >= 0 && j < num_faces);
+		assert(visibilities != NULL);
+		return visibilities[i * num_faces + j];
+	}
 
 	// =====
 	// PAINT
@@ -117,6 +131,7 @@ private:
 
 	double form_factor(const Face *f_i, const Face *f_j) const;
 	double visibility(const Face *f_i, const Face *f_j) const;
+	void calculateVisibilities();
 
 	// ==============
 	// REPRESENTATION
@@ -131,6 +146,7 @@ private:
 
 	// length n vectors
 	double *area;
+	double *visibilities;
 	Vec3f *undistributed; // energy per unit area
 	Vec3f *absorbed; // energy per unit area
 	Vec3f *radiance; // energy per unit area

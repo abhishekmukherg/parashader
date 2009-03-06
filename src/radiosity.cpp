@@ -8,7 +8,7 @@
 #include <math.h>
 #ifndef M_PI
 #warning Using more imprecise version of PI
-static const double M_PI = 3.1415;
+static const double M_PI = 3.141592;
 #endif
 
 // Included files for OpenGL Rendering
@@ -39,6 +39,7 @@ Radiosity::Radiosity(Mesh *m, ArgParser *a) {
   undistributed = NULL;
   absorbed = NULL;
   radiance = NULL;
+  visibilities = NULL;
   max_undistributed_patch = -1;
   total_area = -1;
   Reset();
@@ -54,12 +55,14 @@ void Radiosity::Cleanup() {
   delete [] undistributed;
   delete [] absorbed;
   delete [] radiance;
+  delete [] visibilities;
   num_faces = -1;
   formfactors = NULL;
   area = NULL;
   undistributed = NULL;
   absorbed = NULL;
   radiance = NULL;
+  visibilities = NULL;
   max_undistributed_patch = -1;
   total_area = -1;
 }
@@ -68,6 +71,7 @@ void Radiosity::Reset() {
   delete [] area;
   delete [] undistributed;
   delete [] absorbed;
+  delete [] visibilities;
   delete [] radiance;
 
   // create and fill the data structures
@@ -110,11 +114,11 @@ void Radiosity::findMaxUndistributed() {
   assert (max_undistributed_patch >= 0 && max_undistributed_patch < num_faces);
 }
 
-
 void Radiosity::ComputeFormFactors()
 {
 	assert(formfactors == NULL);
 	assert(num_faces > 0);
+
 	formfactors = new double[num_faces * num_faces];
 
 	std::cout << "Calculating form factors" << std::endl;
@@ -135,12 +139,34 @@ void Radiosity::ComputeFormFactors()
 	std::cout << "Done calculating form factors" << std::endl;
 }
 
+void Radiosity::calculateVisibilities()
+{
+	assert(visibilities == NULL);
+	assert(num_faces > 0);
+	visibilities = new double[num_faces * num_faces];
+	std::cout << "Calculating visibilities" << std::endl;
+#pragma omp parallel for
+	for (int i = 0; i < num_faces; ++i) {
+		const Face *f_i(mesh->getFace(i));
+#pragma omp parallel for
+		for (int j = 0; j < num_faces; ++j) {
+			if (i == j) {
+				setVisibility(i, j, 0);
+				continue;
+			}
+			const Face *f_j(mesh->getFace(j));
+			setVisibility(i, j, visibility(f_i, f_j));
+		}
+	}
+}
+
 double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
 {
 	double value = 0;
 	const Vec3f n_i = f_i->computeNormal();
 	const Vec3f n_j = f_j->computeNormal();
-	const double vis = visibility(f_i, f_j);
+	const double vis(getVisibility(f_i->getRadiosityPatchIndex(),
+			f_j->getRadiosityPatchIndex()));
 #pragma omp parallel for reduction(+:value)
 	for (int i = 0; i < NUM_RAYS; ++i) {
 		/* Get sample points */
@@ -170,7 +196,8 @@ double Radiosity::visibility(const Face *f_i, const Face *f_j) const
 {
 	if (args->num_shadow_samples == 0)
 		return 1;
-	double visibility = 0;
+	double visibility(0);
+#pragma omp parallel for reduction(+:visibility)
 	for (int i = 0; i < args->num_shadow_samples; ++i) {
 		const Vec3f p_i(f_i->RandomPoint());
 		const Vec3f p_j(f_j->RandomPoint());
@@ -178,7 +205,7 @@ double Radiosity::visibility(const Face *f_i, const Face *f_j) const
 
 		const Ray ray(p_i, p_ij);
 		Hit h;
-		raytracer->CastRay(ray, h, true);
+		raytracer->CastRay(ray, h, false);
 		if (fabs((ray.pointAtParameter(h.getT()) - p_i).Length() - p_ij.Length()) < FACE_EPSILON) {
 			visibility += 1;
 		}
@@ -191,9 +218,12 @@ double Radiosity::visibility(const Face *f_i, const Face *f_j) const
 
 double Radiosity::Iterate()
 {
+	if (visibilities == NULL)
+		calculateVisibilities();
 	if (formfactors == NULL)
 		ComputeFormFactors();
 	assert(formfactors != NULL);
+	assert(visibilities != NULL);
 
 	Vec3f *answers = new Vec3f[num_faces];
 	for (int i = 0; i < num_faces; ++i) {
@@ -245,6 +275,7 @@ Vec3f Radiosity::whichVisualization(enum RENDER_MODE mode, Face *f, int i) {
   } else if (mode == RENDER_RADIANCE) {
     return getRadiance(i);
   } else if (mode == RENDER_FORM_FACTORS) {
+    if (visibilities == NULL) calculateVisibilities();
     if (formfactors == NULL) ComputeFormFactors();
     double scale = 0.2 * total_area/getArea(i);
     double factor = scale * getFormFactor(max_undistributed_patch,i);
