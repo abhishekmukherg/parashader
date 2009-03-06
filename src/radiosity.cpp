@@ -139,6 +139,7 @@ double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
 	double value = 0;
 	const Vec3f n_i = f_i->computeNormal();
 	const Vec3f n_j = f_j->computeNormal();
+#pragma omp parallel for reduction(+:value)
 	for (int i = 0; i < NUM_RAYS; ++i) {
 		/* Get sample points */
 		const Vec3f p_i(f_i->RandomPoint());
@@ -182,7 +183,7 @@ double Radiosity::Iterate()
 	const int max_und = max_undistributed_patch;
 	const Vec3f face_rad(getRadiance(max_und));
 	for (int i = 0; i < num_faces; ++i) {
-		const Vec3f new_r(getMesh()->getFace(i)->getMaterial()->getDiffuseColor() * getFormFactor(max_und, i) * getRadiance(max_und)
+		const Vec3f new_r(getMesh()->getFace(i)->getMaterial()->getDiffuseColor() * getFormFactor(max_und, i) * face_rad
 				+ getMesh()->getFace(i)->getMaterial()->getEmittedColor());
 		setRadiance(i, new_r);
 		setAbsorbed(i, getAbsorbed(i) + new_r);
