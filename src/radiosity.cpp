@@ -116,8 +116,12 @@ void Radiosity::ComputeFormFactors()
 	assert(num_faces > 0);
 	formfactors = new double[num_faces * num_faces];
 
+	std::cout << "Calculating form factors" << std::endl;
+
+#pragma omp parallel for
 	for (int i = 0; i < num_faces; ++i) {
 		const Face *f_i(mesh->getFace(i));
+#pragma omp parallel for
 		for (int j = 0; j < num_faces; ++j) {
 			if (i == j) {
 				setFormFactor(i, j, 0);
@@ -127,6 +131,7 @@ void Radiosity::ComputeFormFactors()
 			setFormFactor(i, j, form_factor(f_i, f_j));
 		}
 	}
+	std::cout << "Done calculating form factors" << std::endl;
 }
 
 double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
@@ -161,7 +166,7 @@ double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
 			value += (ctheta_i * ctheta_j) / (len * len);
 		}
 	}
-	value = value * f_j->getArea() / (NUM_RAYS * M_PI);
+	value = value * getArea(f_i->getRadiosityPatchIndex()) / (NUM_RAYS * M_PI);
 	assert(value >= 0);
 	return value;
 }
