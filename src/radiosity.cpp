@@ -7,7 +7,7 @@
 #include <cmath>
 #ifndef M_PI
 #warning Using more imprecise version of PI
-#define M_PI 3.1415
+static const double M_PI = 3.1415;
 #endif
 
 // Included files for OpenGL Rendering
@@ -21,7 +21,7 @@
 #include <GL/glut.h>
 #endif
 
-static const int NUM_RAYS = 32;
+static const int NUM_RAYS = 4;
 static const double FACE_EPSILON = 0.000001;
 
 void CollectFacesWithVertex(Vertex *have, Face *f, vector<Face*> &faces);
@@ -120,12 +120,11 @@ void Radiosity::ComputeFormFactors()
 		const Face *f_i(mesh->getFace(i));
 		for (int j = 0; j < num_faces; ++j) {
 			if (i == j) {
-				formfactors[i + j * num_faces] = 0;
+				setFormFactor(i, j, 0);
 				continue;
 			}
 			const Face *f_j(mesh->getFace(j));
-			formfactors[i + j * num_faces] = form_factor(f_i, f_j);
-			std::cout << formfactors[i + j * num_faces] << std::endl;
+			setFormFactor(i, j, form_factor(f_i, f_j));
 		}
 	}
 }
@@ -176,35 +175,31 @@ double Radiosity::Iterate()
 		ComputeFormFactors();
 	assert(formfactors != NULL);
 
-	Vec3f *answers = new Vec3f[num_faces];
+	const int max_und = max_undistributed_patch;
+	const Vec3f face_rad(getRadiance(max_und));
 	for (int i = 0; i < num_faces; ++i) {
-		const double *f = &formfactors[i * num_faces];
-		Vec3f answer(0, 0, 0);
-		for (int j = 0; j < num_faces; ++j) {
-			answer += getRadiance(j) * f[j] * 0.2;
-			answer += mesh->getFace(i)->getMaterial()->getEmittedColor();
-			assert(mesh->getFace(i)->getRadiosityPatchIndex() == i);
-		}
-		answers[i] = answer;
+		const Vec3f new_r(getFormFactor(max_und, i) * getRadiance(max_und)
+				+ getMesh()->getFace(i)->getMaterial()->getEmittedColor());
+		setRadiance(i, new_r);
+		setAbsorbed(i, getAbsorbed(i) + new_r);
+
 	}
+	setUndistributed(max_und, Vec3f(0,0,0));
+	findMaxUndistributed();
+
 
 	std::cout << "[";
-	std::cout << "<" << answers[0].x() << "," << answers[0].y() <<
-				"," << answers[0].z();
+	std::cout << "<" << undistributed[0].x() << "," << undistributed[0].y() <<
+				"," << undistributed[0].z() << ">";
 	for (int i = 1; i < num_faces; ++i) {
-		std::cout << ", <" << answers[i].x() << "," << answers[i].y() <<
-			"," << answers[i].z() << ">";
+		std::cout << ", <" << undistributed[i].x() << "," << undistributed[i].y() <<
+			"," << undistributed[i].z() << ">";
 	}
 	std::cout << "]" << std::endl;
 
-	for(int i = 0; i < num_faces; ++i) {
-		radiance[i] = answers[i];
-	}
-	delete[] answers;
-
 	// fix this: return the total light yet undistributed
 	// (so we can decide when the solution has sufficiently converged)
-	return 0;
+	return total_undistributed;
 
 }
 
