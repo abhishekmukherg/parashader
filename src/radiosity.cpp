@@ -165,7 +165,7 @@ double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
 			value += (ctheta_i * ctheta_j) / (len * len);
 		}
 	}
-	value = value * getArea(f_i->getRadiosityPatchIndex()) / (NUM_RAYS * M_PI);
+	value = value * getArea(f_j->getRadiosityPatchIndex()) / (NUM_RAYS * M_PI);
 	assert(value >= 0);
 	return value;
 }
