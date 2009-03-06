@@ -160,8 +160,8 @@ Vec3f RayTracer::shadows(const Ray &ray, const Hit &hit) const
 			for (int s = 0; s <= args->num_shadow_samples; ++s) {
 				const Vec3f sh = shadow(point, pointOnLight, f, ray, hit);
 				answerx += sh.x();
-				answery += sh.x();
-				answerz += sh.x();
+				answery += sh.y();
+				answerz += sh.z();
 				pointOnLight = f->RandomPoint();
 			}
 		}
