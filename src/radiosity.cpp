@@ -119,6 +119,10 @@ void Radiosity::ComputeFormFactors()
 	for (int i = 0; i < num_faces; ++i) {
 		const Face *f_i(mesh->getFace(i));
 		for (int j = 0; j < num_faces; ++j) {
+			if (i == j) {
+				formfactors[i + j * num_faces] = 0;
+				continue;
+			}
 			const Face *f_j(mesh->getFace(j));
 			formfactors[i + j * num_faces] = form_factor(f_i, f_j);
 			std::cout << formfactors[i + j * num_faces] << std::endl;
@@ -129,30 +133,38 @@ void Radiosity::ComputeFormFactors()
 double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
 {
 	double value = 0;
+	const Vec3f n_i = f_i->computeNormal();
+	const Vec3f n_j = f_j->computeNormal();
 	for (int i = 0; i < NUM_RAYS; ++i) {
 		/* Get sample points */
 		const Vec3f p_i(f_i->RandomPoint());
 		const Vec3f p_j(f_j->RandomPoint());
+
 		/* Connecting vector */
 		Vec3f p_ij(p_j - p_i);
-
-		const double ctheta_i(p_ij.CosAngleBetween(f_i->computeNormal()));
-		const double ctheta_j(p_ij.CosAngleBetween(f_j->computeNormal()));
+		/* Angle between vector and normals of faces */
+		const double ctheta_i(p_ij.CosAngleBetween(n_i));
+		p_ij.Negate();
+		const double ctheta_j(p_ij.CosAngleBetween(n_j));
+		p_ij.Negate();
+		/* Obtruse angles -> visibility is 0 */
 		if (ctheta_i < 0 || ctheta_j < 0)
 			continue;
 
 		p_ij.Normalize();
 		Hit h;
+		/* Make sure the view is not obstructed */
 		const Ray ray(p_i + (p_ij * FACE_EPSILON), p_ij);
-		raytracer->CastRay(ray, h, false);
-		/* Calculate the cosine of theta */
-		const double len = p_ij.Length();
-		if (h.getMaterial() == f_j->getMaterial())
+		const bool intersect = raytracer->CastRay(ray, h, false);
+
+		if (intersect && h.getMaterial() == f_j->getMaterial()) {
+			const double len = p_ij.Length();
 			value += (ctheta_i * ctheta_j) / (len * len);
+		}
 	}
-	value = value * f_i->getArea() / (NUM_RAYS * M_PI);
+	value = value * f_j->getArea() / (NUM_RAYS * M_PI);
 	assert(value >= 0);
-	return value * f_i->getArea() / (NUM_RAYS * M_PI);
+	return value;
 }
 
 // ================================================================
@@ -169,13 +181,21 @@ double Radiosity::Iterate()
 		const double *f = &formfactors[i * num_faces];
 		Vec3f answer(0, 0, 0);
 		for (int j = 0; j < num_faces; ++j) {
-			answer += radiance[j] * f[j] +
-				mesh->getFace(i)->getMaterial()->getEmittedColor();
-			++f;
+			answer += getRadiance(j) * f[j] * 0.2;
+			answer += mesh->getFace(i)->getMaterial()->getEmittedColor();
 			assert(mesh->getFace(i)->getRadiosityPatchIndex() == i);
 		}
 		answers[i] = answer;
 	}
+
+	std::cout << "[";
+	std::cout << "<" << answers[0].x() << "," << answers[0].y() <<
+				"," << answers[0].z();
+	for (int i = 1; i < num_faces; ++i) {
+		std::cout << ", <" << answers[i].x() << "," << answers[i].y() <<
+			"," << answers[i].z() << ">";
+	}
+	std::cout << "]" << std::endl;
 
 	for(int i = 0; i < num_faces; ++i) {
 		radiance[i] = answers[i];
