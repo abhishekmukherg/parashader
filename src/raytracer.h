@@ -35,11 +35,12 @@ public:
         // does the recursive work
         Vec3f TraceRay(const Ray &ray, Hit &hit, int bounce_count = 0) const;
 
+	Vec3f shadows(const Ray &ray, const Hit &hit) const;
+	Vec3f reflections(const Ray &ray, const Hit &hit, int bounce_count, double roughness) const;
+
 private:
 
-	Vec3f shadows(const Ray &ray, const Hit &hit) const;
 	Vec3f shadow(const Vec3f &point, const Vec3f &pointOnLight, const Face *f, const Ray &ray, const Hit &hit) const;
-	Vec3f reflections(const Ray &ray, const Hit &hit, int bounce_count, double roughness) const;
 	Vec3f reflection(const Ray &ray, int bounce_count) const;
 
         RayTracer() {

@@ -116,6 +116,7 @@ public:
 private:
 
 	double form_factor(const Face *f_i, const Face *f_j) const;
+	double visibility(const Face *f_i, const Face *f_j) const;
 
 	// ==============
 	// REPRESENTATION
