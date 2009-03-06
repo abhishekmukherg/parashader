@@ -190,7 +190,11 @@ double Radiosity::Iterate()
 		value += getMesh()->getFace(i)->getMaterial()->getEmittedColor();
 		answers[i] = value;
 	}
+	double max_difference;
 	for (int i = 0; i < num_faces; ++i) {
+		const double new_diff((getRadiance(i) - answers[i]).Length() / answers[i].Length());
+		if (new_diff > max_difference)
+			max_difference = new_diff;
 		setRadiance(i, answers[i]);
 	}
 	delete[] answers;
@@ -206,7 +210,7 @@ double Radiosity::Iterate()
 
 	// fix this: return the total light yet undistributed
 	// (so we can decide when the solution has sufficiently converged)
-	return total_undistributed;
+	return max_difference;
 
 }
 
