@@ -168,7 +168,7 @@ double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
 	const double vis(getVisibility(f_i->getRadiosityPatchIndex(),
 			f_j->getRadiosityPatchIndex()));
 #pragma omp parallel for reduction(+:value)
-	for (int i = 0; i < NUM_RAYS; ++i) {
+	for (int i = 0; i < args->num_form_factor_samples; ++i) {
 		/* Get sample points */
 		const Vec3f p_i(f_i->RandomPoint());
 		const Vec3f p_j(f_j->RandomPoint());
@@ -187,7 +187,8 @@ double Radiosity::form_factor(const Face *f_i, const Face *f_j) const
 		const double len = (p_j - p_i).Length();
 		value += (vis * ctheta_i * ctheta_j) / (len * len);
 	}
-	value = value * getArea(f_j->getRadiosityPatchIndex()) / (NUM_RAYS * M_PI);
+	value = value * getArea(f_j->getRadiosityPatchIndex()) /
+		(args->num_form_factor_samples * M_PI);
 	assert(value >= 0);
 	return value;
 }
@@ -203,9 +204,11 @@ double Radiosity::visibility(const Face *f_i, const Face *f_j) const
 		const Vec3f p_j(f_j->RandomPoint());
 		const Vec3f p_ij(p_j - p_i);
 
-		const Ray ray(p_i, p_ij);
+		Ray ray(p_i, p_ij);
 		Hit h;
-		raytracer->CastRay(ray, h, false);
+		do {
+			raytracer->CastRay(ray, h, true);
+		} while (h.getMaterial() == f_i->getMaterial() && h.getT() < FACE_EPSILON);
 		if (fabs((ray.pointAtParameter(h.getT()) - p_i).Length() - p_ij.Length()) < FACE_EPSILON) {
 			visibility += 1;
 		}
@@ -224,6 +227,8 @@ double Radiosity::Iterate()
 		ComputeFormFactors();
 	assert(formfactors != NULL);
 	assert(visibilities != NULL);
+
+	max_undistributed_patch = 20;
 
 	Vec3f *answers = new Vec3f[num_faces];
 	for (int i = 0; i < num_faces; ++i) {
