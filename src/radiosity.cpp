@@ -249,15 +249,6 @@ double Radiosity::Iterate()
 	}
 	delete[] answers;
 
-	std::cout << "[";
-	std::cout << "<" << undistributed[0].x() << "," << undistributed[0].y() <<
-				"," << undistributed[0].z() << ">";
-	for (int i = 1; i < num_faces; ++i) {
-		std::cout << ", <" << undistributed[i].x() << "," << undistributed[i].y() <<
-			"," << undistributed[i].z() << ">";
-	}
-	std::cout << "]" << std::endl;
-
 	// fix this: return the total light yet undistributed
 	// (so we can decide when the solution has sufficiently converged)
 	return max_difference;
