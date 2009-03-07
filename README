@@ -1,0 +1,19 @@
+Major bullet point review, I'll send a larger one when I get home. Sorry the
+cab is coming in approximately 10 minutes
+
+Basic ray casting is done happily. Shadows and such are just as described in
+the lecture notes with little variation. The glossy is done by taking the
+primal reflection ray, and adding a random vector that is found from
+multiplying the roughness times a random value in [0, 1) in each coordinate. 
+
+Extra credit:
+Soft shadows are implemented much like glossy reflections.
+Soft shadows are parallel
+Glossy Reflections are Parallel
+
+
+Radiosity:
+I used a simple Monte Carlo method and did a full matrix iteration each time.
+The randomness seems much more random than the results on the assignment but
+results are generally satisfactory except for a few pocket cases. Occlusion is
+done much like soft shadows, thus any number of sample points are allowable
