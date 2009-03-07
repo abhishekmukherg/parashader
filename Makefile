@@ -1,3 +1,4 @@
+OBJECTS=cornell_box_diffuse_sphere.obj cornell_box.obj cornell_box_reflective_spheres.obj cornell_box_texture.obj glossy_sphere.obj green_mosaic.ppm l.obj reflective_spheres.obj rocks.ppm
 all:
 	cmake -DCMAKE_BUILD_TYPE=Release .
 	make
@@ -11,7 +12,7 @@ cygwin_x: all
 osx: all
 
 clean:
-	for i in objects/*; do rm -f $(basename $i); done
+	rm -f ${OBJECTS}
 	rm -f render
 
 .PHONY: all clean
