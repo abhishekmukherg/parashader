@@ -4,4 +4,8 @@ all:
 	cp objects/* .
 	ln -s src/render
 
-.PHONY: all
+clean:
+	for i in objects/*; do rm -f $(basename $i); done
+	rm -f render
+
+.PHONY: all clean
