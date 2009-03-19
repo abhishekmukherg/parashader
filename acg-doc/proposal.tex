@@ -1,4 +1,4 @@
-\documentclass[preprint]{acmsiggraph}          % preprint
+\documentclass{acmsiggraph}
 
 \usepackage[scaled=.92]{helvet}
 \usepackage{times}
@@ -52,31 +52,29 @@ Ben Boeckel\thanks{e-mail: boeckb@rpi.edu} %
 \begin{abstract}
 
 In the growing times where software are moving towards parallelism, new schemes
-have to be reprogrammed to utilize multiple core powers.  Toon shading, a
+have to be reprogrammed to utilize multiple core powers.Toon shading, a
 non-photo-realistic rendering popularized by Sega's Jet Grind Radio, would
-particularly benefit from this movement.  The graphical technique requires a
+particularly benefit from this movement.The graphical technique requires a
 number of pre-calculation based on the model's properties, such as material and
-a specialized one-dimensional texture.  With this in mind, a parallel system
+a specialized one-dimensional texture.With this in mind, a parallel system
 would very easily optimize cell shading rendition to its best efficiency.
 
 While numerous works created their own unique graphical style, we'll be working
 with the ``watercolor'' style seen in games: cel-shading (also known as hard
-shading) without bold outlines.  There are a few examples of this style in
+shading) without bold outlines.There are a few examples of this style in
 games, including Grasshopper Manufacture's No More Heroes and Nintendo's Legend
-of Zelda: The Wind Waker.  Due to the time constraint, the outline rendering
-common in cel-shaded games will not be implemented.  As our mentioned games
+of Zelda: The Wind Waker.Due to the time constraint, the outline rendering
+common in cel-shaded games will not be implemented. As our mentioned games
 shown, humans are still capable of perceiving depth on cel-shaded graphics
-without borders.  Shadows will be used as the depth indicator instead, and if
+without borders.Shadows will be used as the depth indicator instead, and if
 we have enough time, we may add atmospheric perspective as well.
 
 Goal-wise, we'll initially begin with a simple single dimension texture
 implementation found in the paper below, Stylized Rendering Techniques For
 Real-Time 3D Animation, and the shadow rendition, Shadows for Cel Animation.
-If time permits, we'd also like to try the two dimensional texture extension
-from Xtoon: An Extended Toon Shader and replacing certain degree of shading
-with bill boarded texture a method also mentioned in Stylized Rendering
-Techniques For Real-Time 3D Animation.  The intended style, though, may differ
-from the pencil sketch version the document mentions.
+If time permits, we would also like to try the two dimensional texture
+extension from Barla et al.\shortcite{barla2006xte} The intended style, though,
+may differ from the pencil sketch version the document mentions.
 
 \end{abstract}
 
@@ -85,9 +83,9 @@ from the pencil sketch version the document mentions.
 %% The ``\CRcat'' command takes four arguments.
 
 %\begin{CRcatlist}
-%  \CRcat{K.6.1}{Management of Computing and Information Systems}%
+%\CRcat{K.6.1}{Management of Computing and Information Systems}%
 %{Project and People Management}{Life Cycle};
-%  \CRcat{K.7.m}{The Computing Profession}{Miscellaneous}{Ethics}
+%\CRcat{K.7.m}{The Computing Profession}{Miscellaneous}{Ethics}
 %\end{CRcatlist}
 
 %% The ``\keywordlist'' command prints out the keywords.
@@ -97,7 +95,32 @@ from the pencil sketch version the document mentions.
 
 \section*{Related Works}
 
-To Robert, for all the bagels.\cite{lake2000srt}
+\begin{itemize}
+\item
+An incredibly popular paper describing three distinct techniques on rendering
+flat, cartoon-like graphics efficiently.The first technique implements a
+flexible method of shading flat colors, using a one dimensional texture and a
+simple calculation used on all vertexes.It crudely rounds the surface and
+lighting direction normals to map shades to the model.The second method uses
+the same implementation as the first technique, except using separate textures
+as shades rather than color.The third part describes a method of creating
+bold outlines on sharp edges to further imply flatness on the
+model.\cite{lake2000srt}
+
+\item
+
+
+\item
+An extension to the engine mentioned in Intel's Stylized Rendering Techniques
+For Real-Time 3D Animation that portrays the atmospheric perspective (an art
+technique devised by Leonardo Da Vinci) by using a two dimensional shade
+texture instead of one dimensional.The added dimension corresponds to the
+distance from the camera.The paper further adds directional shading as well.
+Rather than always having the light come from a point source, their algorithm
+also adds a specific shading orientation (such as vertical, horizontal, or
+circular) as well to create a variety of effects, including
+back-lighting.\cite{barla2006xte}
+\end{itemize}
 
 \bibliographystyle{acmsiggraph}
 \nocite{*}
