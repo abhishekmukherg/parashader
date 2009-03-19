@@ -1,0 +1,105 @@
+\documentclass[preprint]{acmsiggraph}          % preprint
+
+\usepackage[scaled=.92]{helvet}
+\usepackage{times}
+
+%% The 'graphicx' package allows for the inclusion of EPS figures.
+
+\usepackage{graphicx}
+
+%% use this for zero \parindent and non-zero \parskip, intelligently.
+
+\usepackage{parskip}
+
+%% Optional: the 'caption' package provides a nicer-looking replacement
+%% for the standard caption environment. With 'labelfont=bf,'textfont=it',
+%% caption labels are bold and caption text is italic.
+
+\usepackage[labelfont=bf,textfont=it]{caption}
+
+%% If you are submitting a paper to the annual conference, please replace 
+%% the value ``0'' below with the numeric value of your OnlineID. 
+%% If you are not submitting this paper to the annual conference, 
+%% you may safely leave it at ``0'' -- it will not be included in the output.
+
+\onlineid{0}
+
+%% Paper title.
+
+\title{Parallel Toon Shading on the BlueGene/L}
+
+%% Author and Affiliation (single author).
+
+%%\author{Roy G. Biv\thanks{e-mail: roy.g.biv@aol.com}\\Allied Widgets Research}
+
+%% Author and Affiliation (multiple authors).
+\author{%
+Ben Boeckel\thanks{e-mail: boeckb@rpi.edu} %
+\and Artem Kochnev\thanks{e-mail: kochna@rpi.edu} %
+\and Abhishek Mukherjee\thanks{e-mail: mukhea2@rpi.edu} %
+\and Taro Omiya\thanks{e-mail: omiyat@rpi.edu}}
+
+%% Keywords that describe your work.
+
+\keywords{parallel, toon, cel-shading, bluegene}
+
+%%%%%% START OF THE PAPER %%%%%%
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+In the growing times where software are moving towards parallelism, new schemes
+have to be reprogrammed to utilize multiple core powers.  Toon shading, a
+non-photo-realistic rendering popularized by Sega's Jet Grind Radio, would
+particularly benefit from this movement.  The graphical technique requires a
+number of pre-calculation based on the model's properties, such as material and
+a specialized one-dimensional texture.  With this in mind, a parallel system
+would very easily optimize cell shading rendition to its best efficiency.
+
+While numerous works created their own unique graphical style, we'll be working
+with the ``watercolor'' style seen in games: cel-shading (also known as hard
+shading) without bold outlines.  There are a few examples of this style in
+games, including Grasshopper Manufacture's No More Heroes and Nintendo's Legend
+of Zelda: The Wind Waker.  Due to the time constraint, the outline rendering
+common in cel-shaded games will not be implemented.  As our mentioned games
+shown, humans are still capable of perceiving depth on cel-shaded graphics
+without borders.  Shadows will be used as the depth indicator instead, and if
+we have enough time, we may add atmospheric perspective as well.
+
+Goal-wise, we'll initially begin with a simple single dimension texture
+implementation found in the paper below, Stylized Rendering Techniques For
+Real-Time 3D Animation, and the shadow rendition, Shadows for Cel Animation.
+If time permits, we'd also like to try the two dimensional texture extension
+from Xtoon: An Extended Toon Shader and replacing certain degree of shading
+with bill boarded texture a method also mentioned in Stylized Rendering
+Techniques For Real-Time 3D Animation.  The intended style, though, may differ
+from the pencil sketch version the document mentions.
+
+\end{abstract}
+
+%% ACM Computing Review (CR) categories. 
+%% See <http://www.acm.org/class/1998/> for details.
+%% The ``\CRcat'' command takes four arguments.
+
+%\begin{CRcatlist}
+%  \CRcat{K.6.1}{Management of Computing and Information Systems}%
+%{Project and People Management}{Life Cycle};
+%  \CRcat{K.7.m}{The Computing Profession}{Miscellaneous}{Ethics}
+%\end{CRcatlist}
+
+%% The ``\keywordlist'' command prints out the keywords.
+\keywordlist
+
+\section*{Timeline}
+
+\section*{Related Works}
+
+To Robert, for all the bagels.\cite{lake2000srt}
+
+\bibliographystyle{acmsiggraph}
+\nocite{*}
+\bibliography{parashader}
+\end{document}
