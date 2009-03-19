@@ -23,6 +23,7 @@
 %% you may safely leave it at ``0'' -- it will not be included in the output.
 
 \onlineid{0}
+\newcommand{\timestamp}{\textbf}
 
 %% Paper title.
 
@@ -92,11 +93,37 @@ may differ from the pencil sketch version the document mentions.
 \keywordlist
 
 \section*{Timeline}
+\begin{itemize}
+\item \timestamp{2008-03-30} At this time, we would like to have the basic
+framework for the renderer and image exporter completed, including class
+structure and hierarchy as well. It will also be discussed during this time
+whether it would be beneficial or not to use the class structure from previous
+coding projects, since the structure necessary to work well with the BlueGene
+may be very different. Plan out other steps and how papers will be molded to
+fit the parallel architecture.
+
+\item \timestamp{2008-04-06} Implemented the work from Lake et
+al.\shortcite{lake2000srt}\ on rendering toon-shading based on the discussion
+from the previous weeks about the new architecture. At this point, we should be
+able to render a simple scene in toon shading and it should look decent. 
+
+\item \timestamp{2008-04-13} Implemented level of detail adjustments from Barla
+et al.\shortcite{barla2006xte}\ for arbitrary levels of details. In addition,
+create as many in-line filters, time permitting, from the same paper. 
+
+\item \timestamp{2008-04-20} Implemented extensible post-processing filters as
+well as, at the least, the object outlines filter from
+Decaudin\shortcite{decaudin1996clr}.
+
+\item \timestamp{2008-04-23} Beautify code, Buffer time for time inflation from
+other tasks.
+\end{itemize}
 
 \section*{Related Works}
 
 \begin{itemize}
 \item
+\textbf{Stylized rendering techniques for scalable real-time 3d animation}.
 An incredibly popular paper describing three distinct techniques on rendering
 flat, cartoon-like graphics efficiently.The first technique implements a
 flexible method of shading flat colors, using a one dimensional texture and a
@@ -108,9 +135,16 @@ bold outlines on sharp edges to further imply flatness on the
 model.\cite{lake2000srt}
 
 \item
-
+\textbf{Cartoon-looking rendering of 3D-scenes}.
+This paper describes many different ways to completely implement a toon shading
+world. However, the interesting part for us would be the objects' outlines post
+processing filter. It creates this by making a depth buffer of the entire scene
+and taking the gradient, those places where it changes too steeply are shading
+in black.
+\cite{decaudin1996clr}
 
 \item
+\textbf{X-toon: an extended toon shader}.
 An extension to the engine mentioned in Intel's Stylized Rendering Techniques
 For Real-Time 3D Animation that portrays the atmospheric perspective (an art
 technique devised by Leonardo Da Vinci) by using a two dimensional shade
@@ -123,6 +157,5 @@ back-lighting.\cite{barla2006xte}
 \end{itemize}
 
 \bibliographystyle{acmsiggraph}
-\nocite{*}
 \bibliography{parashader}
 \end{document}
