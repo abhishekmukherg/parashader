@@ -1,46 +1,6 @@
-Once make has been run on this directory, it will clobber the usual makeile, to rebuild the project on a different computer/architecture run:
+To build for the first time, one can just run `make` Once make has been run on
+this directory, it will clobber the usual makeile, to rebuild the project on a
+different computer/architecture run:
 
 $ cmake .
 $ make
-
-Basic ray casting is done happily. Shadows and such are just as described in
-the lecture notes with little variation. The glossy is done by taking the
-primal reflection ray, and adding a random vector that is found from
-multiplying the roughness times a random value in [0, 1) in each coordinate. 
-
-Extra credit:
-* Soft shadows are implemented much like glossy reflections, except random
-points are sampled on the lights instead.
-* Soft shadows are computed parallel -> optimized soft shadow computation
-* Glossy reflections are parallel -> optimized reflection computation
-(parallel optimizations makes soft shadow calculations taken constant time with
-n processors, or O(n/p) time for fewer. The benefits of parallelizing shows
-more with glossy reflections as the bouncing requires much more computation
-than a simple soft shadow calculation.)
-
-
-Radiosity:
-I used a simple Monte Carlo method to find the form factors for each piece and
-iterated over the entire matrix on each iteration. This does not follow the
-max_undestributed_light method suggested to be used by the code but sort of
-hacks around it instead. In my tests, there have been various degenerate cases
-where it looks like the random number generated just decided to take a hike
-and, for example, the entire scene would be painted red.  Occlusion is done
-much like soft shadows, thus any number of sample points are allowable and more
-points will allow for softer shadows throughout the scene. An occlusion map is
-computed before the form factors, which simple hold double values for how well
-one patch sees another patch.
-
-The only bug (THE ONLY BUG I SAY) is collision detection on the tops and
-bottoms of spheres, however I noticed this after I got on the bus so I'm
-restraining myself from fixing it. The way to fix it would be to compare the
-hit data structure from visibility and checking if the hit was near location
-p_i, the starting position for the ray. Although i'm checking the T value, with
-a fuzzy epsilon comparison, it does not seem to be enough for the non-planar
-surface
-
-Extra Credit:
-* Form Factors and visibility map is computed parallely
-Now THIS is actually a big benefit. I've noticed times cut in half with my
-two-core processor with just this little addition and the processor sustains a
-100% load on both cores.
