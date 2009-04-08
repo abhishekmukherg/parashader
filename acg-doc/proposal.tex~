@@ -57,12 +57,6 @@ The results will be a png image file.  With time, we may implement other
 effects, such as a limited version of non-photo realistic implementation,
 different reflection/refraction effects, and others.
 
-\section{}
-The program will be tested using the object models from Advanced Computer
-Graphics.  Various measurements will be used to test the performance of our
-program: the number of sphere's, number of time the ray can bounce, and number
-of samples for shadows.
-
 \keywordlist
 
 \section*{Timeline}
