@@ -47,12 +47,19 @@ application, it's pipeline structure causes inaccuracies to occur in lighting
 physics.  As such, an efficient, accurate graphical application is required
 Ray-tracing can render lightings very accurately, but falls short in efficiency
 With a massively parallel system such as Blue Gene, however, ray-tracing can be
-rendered at a much faster speed
+rendered at a much faster speed.
 \end{abstract}
 
 \section{}
+Several attributes aboute ray-tracing lends itself well to networked computers
+such as the Blue Gene L, regardless of whether it uses threads or Message
+Passing Interface (MPI).  Each ray in ray-tracing acts independently from each
+other, and communication between each calculation occurs only in the end of
+tracing.  Finally, the program can be completely CPU-based.
+
 Through this project, we will prove that it is possible to generate realistic
 graphics on a highly parallel system created originally for scientific uses.
+The libraries we plan to use is the MPI library for the Blue Gene L.
 The results will be a png image file.  With time, we may implement other
 effects, such as a limited version of non-photo realistic implementation,
 different reflection/refraction effects, and others.
