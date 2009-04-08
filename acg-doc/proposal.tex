@@ -27,96 +27,42 @@
 
 %% Paper title.
 
-\title{Parallel Toon Shading on the BlueGene/L}
+\title{Parallel Ray Tracing on the BlueGene/L}
 
-%% Author and Affiliation (single author).
-
-%%\author{Roy G. Biv\thanks{e-mail: roy.g.biv@aol.com}\\Allied Widgets Research}
-
-%% Author and Affiliation (multiple authors).
 \author{%
 Ben Boeckel\thanks{e-mail: boeckb@rpi.edu} %
 \and Artem Kochnev\thanks{e-mail: kochna@rpi.edu} %
 \and Abhishek Mukherjee\thanks{e-mail: mukhea2@rpi.edu} %
 \and Taro Omiya\thanks{e-mail: omiyat@rpi.edu}}
 
-%% Keywords that describe your work.
-
-\keywords{parallel, toon, cel-shading, bluegene}
-
-%%%%%% START OF THE PAPER %%%%%%
+\keywords{parallel, raytracing, bluegene}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-
-In the growing times where software are moving towards parallelism, new schemes
-have to be reprogrammed to utilize multiple core powers.Toon shading, a
-non-photo-realistic rendering popularized by Sega's Jet Grind Radio, would
-particularly benefit from this movement.The graphical technique requires a
-number of pre-calculation based on the model's properties, such as material and
-a specialized one-dimensional texture.With this in mind, a parallel system
-would very easily optimize cell shading rendition to its best efficiency.
-
-While numerous works created their own unique graphical style, we'll be working
-with the ``watercolor'' style seen in games: cel-shading (also known as hard
-shading) without bold outlines.There are a few examples of this style in
-games, including Grasshopper Manufacture's No More Heroes and Nintendo's Legend
-of Zelda: The Wind Waker.Due to the time constraint, the outline rendering
-common in cel-shaded games will not be implemented. As our mentioned games
-shown, humans are still capable of perceiving depth on cel-shaded graphics
-without borders.Shadows will be used as the depth indicator instead, and if
-we have enough time, we may add atmospheric perspective as well.
-
-Goal-wise, we'll initially begin with a simple single dimension texture
-implementation found in the paper below, Stylized Rendering Techniques For
-Real-Time 3D Animation, and the shadow rendition, Shadows for Cel Animation.
-If time permits, we would also like to try the two dimensional texture
-extension from Barla et al.\shortcite{barla2006xte} The intended style, though,
-may differ from the pencil sketch version the document mentions.
-
+While libraries such as Nvidia's CUDA can greatly optimize the graphical
+application, it's pipeline structure causes inaccuracies to occur in lighting
+physics.  As such, an efficient, accurate graphical application is required
+Ray-tracing can render lightings very accurately, but falls short in efficiency
+With a massively parallel system such as Blue Gene, however, ray-tracing can be
+rendered at a much faster speed
 \end{abstract}
 
-%% ACM Computing Review (CR) categories. 
-%% See <http://www.acm.org/class/1998/> for details.
-%% The ``\CRcat'' command takes four arguments.
+\section{}
+Through this project, we will prove that it is possible to generate realistic
+graphics on a highly parallel system created originally for scientific uses.
+The results will be a png image file.  With time, we may implement other
+effects, such as a limited version of non-photo realistic implementation,
+different reflection/refraction effects, and others.
 
-%\begin{CRcatlist}
-%\CRcat{K.6.1}{Management of Computing and Information Systems}%
-%{Project and People Management}{Life Cycle};
-%\CRcat{K.7.m}{The Computing Profession}{Miscellaneous}{Ethics}
-%\end{CRcatlist}
-
-%% The ``\keywordlist'' command prints out the keywords.
 \keywordlist
 
 \section*{Timeline}
 \begin{itemize}
-\item \timestamp{2008-03-30} At this time, we would like to have the basic
-framework for the renderer and image exporter completed, including class
-structure and hierarchy as well. It will also be discussed during this time
-whether it would be beneficial or not to use the class structure from previous
-coding projects, since the structure necessary to work well with the BlueGene
-may be very different. Plan out other steps and how papers will be molded to
-fit the parallel architecture.
-
-\item \timestamp{2008-04-06} Implemented the work from Lake et
-al.\shortcite{lake2000srt}\ on rendering toon-shading based on the discussion
-from the previous weeks about the new architecture. At this point, we should be
-able to render a simple scene in toon shading and it should look decent. 
-
-\item \timestamp{2008-04-13} Implemented level of detail adjustments from Barla
-et al.\shortcite{barla2006xte}\ for arbitrary levels of details. In addition,
-create as many in-line filters, time permitting, from the same paper. 
-
-\item \timestamp{2008-04-20} Implemented extensible post-processing filters as
-well as, at the least, the object outlines filter from
-Decaudin\shortcite{decaudin1996clr}.
-
-\item \timestamp{2008-04-23} Beautify code, Buffer time for time inflation from
-other tasks.
+% TODO: Fill int
+\item Test
 \end{itemize}
 
 \section*{Related Works}
@@ -133,27 +79,6 @@ the same implementation as the first technique, except using separate textures
 as shades rather than color.The third part describes a method of creating
 bold outlines on sharp edges to further imply flatness on the
 model.\cite{lake2000srt}
-
-\item
-\textbf{Cartoon-looking rendering of 3D-scenes}.
-This paper describes many different ways to completely implement a toon shading
-world. However, the interesting part for us would be the objects' outlines post
-processing filter. It creates this by making a depth buffer of the entire scene
-and taking the gradient, those places where it changes too steeply are shading
-in black.
-\cite{decaudin1996clr}
-
-\item
-\textbf{X-toon: an extended toon shader}.
-An extension to the engine mentioned in Intel's Stylized Rendering Techniques
-For Real-Time 3D Animation that portrays the atmospheric perspective (an art
-technique devised by Leonardo Da Vinci) by using a two dimensional shade
-texture instead of one dimensional.The added dimension corresponds to the
-distance from the camera.The paper further adds directional shading as well.
-Rather than always having the light come from a point source, their algorithm
-also adds a specific shading orientation (such as vertical, horizontal, or
-circular) as well to create a variety of effects, including
-back-lighting.\cite{barla2006xte}
 \end{itemize}
 
 \bibliographystyle{acmsiggraph}
