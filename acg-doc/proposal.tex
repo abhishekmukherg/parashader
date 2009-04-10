@@ -70,10 +70,14 @@ Graphics.  Various measurements will be used to test the performance of our
 program: the number of processors, number of models and texture, number of time
 rays can bounce, and number of samples for shadows.
 
+Time permitting, we will also implement a Nonphotorealistic aspect into our
+parallel ray tracer based on the algorithms from Lake et.
+al.\shortcite{lake2000srt}
+
 \section*{Timeline}
 \begin{itemize}
 \item April 13th, Develop plan for necessary data structures to add. 
-\item April 17th, Create data structures. Our goal in this stepwill be to
+\item April 17th, Create data structures. Our goal in this step will be to
 minimize information transmission.
 \item April 20th, Pull out old controller code and all OpenGL calls. Create a
 way to save the output of our program for testing purposes. 
@@ -87,6 +91,24 @@ this period as well.
 \section*{Related Works}
 
 \begin{itemize}
+\item
+\textbf{Distributing data and control for ray tracing in parallel} This paper
+discusses the data structures to be used to minimize data transfer in a
+parallel ray tracer. This will be an important consideration for us, as we
+begin writing our program for the BG/L. Although ray tracing is a relatively
+simple algorithm to implement in a parallel fashion, the only way to get proper
+efficiency out of the program is to manage the data, and the workload,
+properly. We hope this paper will relieve some of the burden of creating
+various parallel data structures to be used. This paper also discusses the
+common deadlocks that could occur in a ray tracing algorithm, which we also
+have to avoid.\cite{badouel1994dda}
+\item
+\textbf{Ray tracing on the cell processor} This paper discusses the special
+considerations that need to be taken into account for developing a ray tracer
+on a parallel algorithm. The architecture they were building for, the Cell, is
+a very different architecture from the BlueGene/L that we will be building our
+algorithm on. We belove that it will form a good basis to start from in our
+discussions about how to create the algorithm on the BG/L.\cite{benthin2006rtc}
 \item
 \textbf{Stylized rendering techniques for scalable real-time 3d animation}.
 An incredibly popular paper describing three distinct techniques on rendering
