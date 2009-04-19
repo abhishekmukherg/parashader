@@ -75,6 +75,19 @@ public:
          i++; assert (i < argc);
          double z = atof(argv[i]);
          camera_direction = Vec3f(x,y,z);
+      } else if (!strcmp(argv[i],"-cam_ori")) {
+         i++; assert (i < argc);
+         double x = atof(argv[i]);
+         i++; assert (i < argc);
+         double y = atof(argv[i]);
+         i++; assert (i < argc);
+         double z = atof(argv[i]);
+         camera_orientation = Vec3f(x,y,z);
+         //make sure the camera orientation is some direction
+         if( camera_orientation.Length() == 0 )
+           camera_orinetation.Set( 0, 1, 0 );
+         else
+           camera_orientation.normalize();
       } else if (!strcmp(argv[i],"-ambient")) {
 	i++; assert (i < argc);
          double r = atof(argv[i]);
@@ -110,6 +123,9 @@ public:
     sphere_vert = 6;
     intersect_backfacing = false;
     background_color = Vec3f(1,1,1);
+    camera_position = Vec3f(0,0,0);
+    camera_direction = Vec3f(0,0,0);
+    camera_orientation = Vec3f(0,1,0);
     background_color_linear = Vec3f(1,1,1);
     ambient_light = Vec3f(0.2,0.2,0.2);
     ambient_light_linear = 
@@ -136,6 +152,7 @@ public:
   Vec3f background_color;
   Vec3f camera_position;
   Vec3f camera_direction;
+  Vec3f camera_orientation;
   Vec3f background_color_linear;
 
   int num_bounces;
