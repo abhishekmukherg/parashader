@@ -6,17 +6,6 @@
 #include "radiosity.h"
 #include "raytracer.h"
 
-// Included files for OpenGL Rendering
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
-#endif
-
 // =========================================
 // =========================================
 
@@ -27,7 +16,6 @@ int main(int argc, char *argv[]) {
   //srand((unsigned)time(0));
 
   ArgParser *args = new ArgParser(argc, argv);
-  glutInit(&argc, argv);
 
   Mesh *mesh = new Mesh();
   mesh->Load(args->input_file,args);

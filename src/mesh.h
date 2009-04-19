@@ -65,7 +65,6 @@ public:
 
   // ===============
   // OTHER FUNCTIONS
-  void PaintWireframe();
   void Subdivision();
 
 private:

@@ -442,9 +442,5 @@ void Radiosity::Paint(ArgParser *args) {
 
   glDisable(GL_POLYGON_OFFSET_FILL);
   HandleGLError();
-
-  if (args->wireframe) {
-    mesh->PaintWireframe();
-  }
 }
 

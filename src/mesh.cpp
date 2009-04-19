@@ -7,20 +7,8 @@ using std::string;
 #include "edge.h"
 #include "vertex.h"
 #include "face.h"
-#include "glCanvas.h"
 #include "vertex_parent.h"
 #include "sphere.h"
-
-// Included files for OpenGL Rendering
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
-#endif
 
 #define INITIAL_VERTEX 10000
 #define INITIAL_EDGE 10000
@@ -354,49 +342,6 @@ void Mesh::Load(const char *input_file, ArgParser *_args) {
 
   std::cout << " mesh loaded " << numFaces() << std::endl;
 
-}
-
-// =======================================================================
-// PAINT
-// =======================================================================
-
-void Mesh::PaintWireframe() {
-
-  glDisable(GL_LIGHTING);
-
-  // draw all the interior edges
-  glLineWidth(1);
-  glColor3f(0,0,0);
-  glBegin (GL_LINES);
-  Iterator<Edge*> *iter = edges->StartIteration();
-  while (Edge *e = iter->GetNext()) {
-    if (e->getOpposite() == NULL) continue;
-    Vec3f a = (*e)[0]->get();
-    Vec3f b = (*e)[1]->get();
-    glVertex3f(a.x(),a.y(),a.z());
-    glVertex3f(b.x(),b.y(),b.z());
-  }
-  edges->EndIteration(iter);
-  glEnd();
-  
-  // draw all the boundary edges
-  glLineWidth(3);
-  glColor3f(1,0,0);
-  glBegin (GL_LINES);
-  iter = edges->StartIteration();
-  while (Edge *e = iter->GetNext()) {
-    if (e->getOpposite() != NULL) continue;
-    Vec3f a = (*e)[0]->get();
-    Vec3f b = (*e)[1]->get();
-    glVertex3f(a.x(),a.y(),a.z());
-    glVertex3f(b.x(),b.y(),b.z());
-  }
-  edges->EndIteration(iter);
-  glEnd();
-  
-  glEnable(GL_LIGHTING);
-  
-  HandleGLError(); 
 }
 
 // =================================================================
