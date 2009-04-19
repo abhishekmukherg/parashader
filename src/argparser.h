@@ -59,6 +59,22 @@ public:
          background_color = Vec3f(r,g,b);
          background_color_linear = 
 	   Vec3f(srgb_to_linear(r),srgb_to_linear(g),srgb_to_linear(b));
+      } else if (!strcmp(argv[i],"-cam_pos")) {
+         i++; assert (i < argc);
+         double x = atof(argv[i]);
+         i++; assert (i < argc);
+         double y = atof(argv[i]);
+         i++; assert (i < argc);
+         double z = atof(argv[i]);
+         camera_position = Vec3f(x,y,z);
+      } else if (!strcmp(argv[i],"-cam_dir")) {
+         i++; assert (i < argc);
+         double x = atof(argv[i]);
+         i++; assert (i < argc);
+         double y = atof(argv[i]);
+         i++; assert (i < argc);
+         double z = atof(argv[i]);
+         camera_direction = Vec3f(x,y,z);
       } else if (!strcmp(argv[i],"-ambient")) {
 	i++; assert (i < argc);
          double r = atof(argv[i]);
@@ -118,6 +134,8 @@ public:
   Vec3f ambient_light;
   Vec3f ambient_light_linear;
   Vec3f background_color;
+  Vec3f camera_position;
+  Vec3f camera_direction;
   Vec3f background_color_linear;
 
   int num_bounces;
