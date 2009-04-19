@@ -85,9 +85,9 @@ public:
          camera_orientation = Vec3f(x,y,z);
          //make sure the camera orientation is some direction
          if( camera_orientation.Length() == 0 )
-           camera_orinetation.Set( 0, 1, 0 );
+           camera_orientation.Set( 0, 1, 0 );
          else
-           camera_orientation.normalize();
+           camera_orientation.Normalize();
       } else if (!strcmp(argv[i],"-ambient")) {
 	i++; assert (i < argc);
          double r = atof(argv[i]);

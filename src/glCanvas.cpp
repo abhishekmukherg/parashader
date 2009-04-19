@@ -11,7 +11,6 @@
 #include <GL/glut.h>
 #endif
 
-#include "argparser.h"
 #include "camera.h"
 #include "radiosity.h"
 #include "raytracer.h"
@@ -54,13 +53,13 @@ void GLCanvas::initialize(ArgParser *_args, Mesh *_mesh, RayTracer *_raytracer, 
   radiosity = _radiosity;
 
   // position the camera scale it so it fits in the window
-  if( camera_position == camera_direction ) {
+  if( args->camera_position == args->camera_direction ) {
     Vec3f point_of_interest = mesh->getBoundingBox()->getCenter();
     double max_dim = mesh->getBoundingBox()->maxDim();
-    Vec3f camera_pos = point_of_interest + Vec3f(0,0,4*max_dim);
-    camera = new PerspectiveCamera(camera_pos, point_of_interest, camera_orientation, 20 * M_PI/180.0);
+    Vec3f camera_position = point_of_interest + Vec3f(0,0,4*max_dim);
+    camera = new PerspectiveCamera(camera_position, point_of_interest, args->camera_orientation, 20 * M_PI/180.0);
   } else {
-    camera = new PerspectiveCamera(camera_position, camera_direction, camera_orientation, 20 * M_PI/180.0);
+    camera = new PerspectiveCamera(args->camera_position, args->camera_direction, args->camera_orientation, 20 * M_PI/180.0);
   }
   // setup glut stuff
   glutInitWindowSize(args->width, args->height);
