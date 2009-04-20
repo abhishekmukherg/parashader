@@ -64,6 +64,7 @@ Vec3f Controller::TraceRay(double x, double y) {
   return color;
 }
 
+
 // Scan through the image from the lower left corner across each row
 // and then up to the top right.  Initially the image is sampled very
 // coarsely.  Increment the static variables that track the progress
@@ -83,56 +84,10 @@ Color Controller::DrawPixel(double x, double y) {
   return 1;
 }
 
-/*
-  if( args->camera_position == args->camera_direction ) {
-    Vec3f point_of_interest = mesh->getBoundingBox()->getCenter();
-    double max_dim = mesh->getBoundingBox()->maxDim();
-    Vec3f camera_position = point_of_interest + Vec3f(0,0,4*max_dim);
-    camera = new PerspectiveCamera(camera_position, point_of_interest, args->camera_orientation, 20 * M_PI/180.0);
-  } else {
-    camera = new PerspectiveCamera(args->camera_position, args->camera_direction, args->camera_orientation, 20 * M_PI/180.0);
-  }
-  */
-
-/*
-  case 'r':  case 'R':
-    // animate raytracing of the scene
-    args->raytracing_animation = !args->raytracing_animation;
-    if (args->raytracing_animation) {
-      raytracing_skip = max2(args->width,args->height) / 10;
-      if (raytracing_skip % 2 == 0) raytracing_skip++;
-      assert (raytracing_skip >= 1);
-      raytracing_x = raytracing_skip/2;
-      raytracing_y = raytracing_skip/2;
-      display(); // clear out any old rendering
-      printf ("raytracing animation started, press 'R' to stop\n");
-    } else
-      printf ("raytracing animation stopped, press 'R' to start\n");
-    break;
-    */
-
-    /*
-    if (args->radiosity_animation) {
-    double undistributed = radiosity->Iterate();
-    if (undistributed < 0.001) {
-      args->radiosity_animation = false;
-      printf ("undistributed < 0.001, animation stopped\n");
-    }
-    Render();
-  }
-  if (args->raytracing_animation) {
-    // draw 100 pixels and then refresh the screen and handle any user input
-    for (int i = 0; i < 100; i++) {
-      if (!DrawPixel()) {
-	args->raytracing_animation = false;
-	break;
-      }
-    }
-  }
-    */
 
 void Controller::PartialRender( int processor_rank, int num_processor ) {
 }
+
 
 void Controller::FullRender() {
 }
