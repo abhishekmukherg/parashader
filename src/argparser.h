@@ -25,6 +25,9 @@ public:
       if (!strcmp(argv[i],"-input")) {
 	i++; assert (i < argc); 
 	input_file = argv[i];
+      } else if (!strcmp(argv[i],"-output")) {
+	i++; assert (i < argc); 
+	output_file = argv[i];
       } else if (!strcmp(argv[i],"-size")) {
 	i++; assert (i < argc); 
 	width = atoi(argv[i]);
@@ -108,6 +111,7 @@ public:
 
   void DefaultValues() {
     input_file = NULL;
+	output_file = NULL;
     width = 100;
     height = 100;
     wireframe = false;
@@ -139,6 +143,7 @@ public:
   // all public! (no accessors)
 
   char *input_file;
+  char *output_file;
   int width;
   int height;
   bool wireframe;
