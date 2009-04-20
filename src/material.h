@@ -5,17 +5,6 @@
 #include <string>
 using std::string;
 
-// Included files for OpenGL Rendering
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
-#endif
-
 #include "vectors.h"
 #include "ray.h"
 #include "hit.h"
@@ -47,7 +36,6 @@ public:
     emittedColor = e_color;
     roughness = rough;
     // need to initialize texture_id after glut has started
-    texture_id = 0;
   }
   
   ~Material();
@@ -59,7 +47,6 @@ public:
   const Vec3f& getEmittedColor() const { return emittedColor; }  
   double getRoughness() const { return roughness; }
   bool hasTextureMap() const { return (textureFile != ""); }
-  GLuint getTextureID();
 
   // SHADE
   // compute the contribution to local illumination at this point for
@@ -79,7 +66,6 @@ protected:
   double roughness;
 
   string textureFile;
-  GLuint texture_id;
   Image image;
 };
 

@@ -2,8 +2,6 @@
 #include "utils.h"
 
 Material::~Material() {
-  if (hasTextureMap())
-    glDeleteTextures(1,&texture_id);
 }
 
 
@@ -28,37 +26,6 @@ const Vec3f Material::getDiffuseColor(double s, double t) const {
 
   return Vec3f(r,g,b);
 }
-
-GLuint Material::getTextureID() { 
-  assert (hasTextureMap()); 
-
-  // if this is the first time the texture is being used, we must
-  // initialize it
-  if (texture_id == 0)  {
-    glGenTextures(1,&texture_id);
-    assert (texture_id != 0);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    // select modulate to mix texture with color for shading
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    // when texture area is small, bilinear filter the closest mipmap
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		     GL_LINEAR_MIPMAP_NEAREST );
-    // when texture area is large, bilinear filter the original
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    // the texture wraps over at the edges (repeat)
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    // to be most compatible, textures should be square and a power of 2
-    assert (image.Width() == image.Height());
-    assert (image.Width() == 256);
-    // build our texture mipmaps
-    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, image.Width(), image.Height(),
-		       GL_RGB, GL_UNSIGNED_BYTE, image.getGLPixelData());
-  }
-  
-  return texture_id;
-}
-
 
 void Material::ComputeAverageTextureColor() {
   assert (hasTextureMap());
