@@ -9,10 +9,41 @@
 
 // sets the camera position based on args
 void Controller::SetCamera() {
+  //setup camera variables
+  orientation = args->camera_orientation;
+  
+  //if camera position and direction are at the same spot,
+  //set camera to default.  Use "direction" as point-of-interest
+  if( args->camera_position == args->camera_direction ) {
+    direction = mesh->getBoundingBox()->getCenter();
+    double max_dim = mesh->getBoundingBox()->maxDim();
+    position = direction + Vec3f(0,0,4*max_dim);
+  } else {
+    direction = args->camera_direction;
+    position = args->camera_position;
+  }
+  
+  //get the actual camera direction
+  direction -= position;
+  direction.Normalize();
+  
+  //M_PI?
+  double angle = 20 * M_PI/180.0
+  
+  //TODO: fix.  up = orientation
+  Vec3f screenCenter = position + direction;
+  double screenHeight = tan(angle/2.0);
+  Vec3f xAxis = getHorizontal() * 2 * screenHeight;
+  Vec3f yAxis = getScreenUp() * 2 * screenHeight;
+  Vec3f lowerLeft = screenCenter - (getScreenUp() * screenHeight) - (getHorizontal() * screenHeight);
+  Vec3f screenPoint = lowerLeft + xAxis*point.x() + yAxis*point.y();
+  Vec3f dir = screenPoint - position;
+  dir.Normalize();
+  return Ray(position,dir);
 }
 
 // trace a ray through pixel (i,j) of the image and return the color
-Vec3f Controller::TraceRay(double i, double j) {
+Ray Controller::TraceRay(double i, double j) {
   // compute and set the pixel color
   int max_d = max2(args->width,args->height);
   double x = (i+0.5-args->width/2.0)/double(max_d)+0.5;
