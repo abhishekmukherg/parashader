@@ -2,7 +2,6 @@
 #include "mesh.h"
 #include "face.h"
 #include "sphere.h"
-#include "raytree.h"
 #include "ray.h"
 
 #include <cmath>
@@ -123,7 +122,6 @@ Vec3f RayTracer::reflection(const Ray &start_ray, int bounce_count) const
 				ray.getDirection());
 		answer = TraceRay(ray, h, bounce_count);
 	}
-	RayTree::AddReflectedSegment(ray, 0, h.getT());
 	return answer;
 }
 
@@ -194,7 +192,6 @@ Vec3f RayTracer::shadow(const Vec3f &point,
 			blocked = CastRay(rayToLight, hLight, false);
 		}
 #pragma omp critical
-		RayTree::AddShadowSegment(rayToLight, 0, hLight.getT());
 		if (hLight.getT() == FLT_MAX || hLight.getMaterial() != f->getMaterial()) {
 			return Vec3f(0, 0, 0);
 		}
