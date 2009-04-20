@@ -20,6 +20,8 @@ int main(int argc, char *argv[]) {
   RayTracer *raytracer = new RayTracer(mesh,args);
 
   // well it never returns from the GLCanvas loop...
+  delete raytracer;
+  delete mesh;
   delete args;
   return 0;
 }
