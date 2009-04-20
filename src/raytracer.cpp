@@ -90,9 +90,7 @@ Vec3f RayTracer::reflections(const Ray &ray, const Hit &hit, int bounce_count, d
 	 * object?
 	 */
 
-#pragma omp parallel shared(answerx,answery,answerz)
 	{
-#pragma omp for private(rand_vec) reduction(+:answerx,answery,answerz)
 		for (int i = 0; i <= args->num_glossy_samples; ++i) {
 			/* Getting gloss ray */
 			Ray start_ray(new_ray.getOrigin(),
@@ -152,9 +150,7 @@ Vec3f RayTracer::shadows(const Ray &ray, const Hit &hit) const
 		const Vec3f point(ray.pointAtParameter(hit.getT()));
 
 		double answerx = 0, answery = 0, answerz = 0;
-#pragma omp parallel shared(answerx,answery,answerz)
 		{
-#pragma omp for private(pointOnLight) reduction(+:answerx,answery,answerz)
 			for (int s = 0; s <= args->num_shadow_samples; ++s) {
 				const Vec3f sh = shadow(point, pointOnLight, f, ray, hit);
 				answerx += sh.x();
@@ -191,7 +187,6 @@ Vec3f RayTracer::shadow(const Vec3f &point,
 					dirToLight);
 			blocked = CastRay(rayToLight, hLight, false);
 		}
-#pragma omp critical
 		if (hLight.getT() == FLT_MAX || hLight.getMaterial() != f->getMaterial()) {
 			return Vec3f(0, 0, 0);
 		}
