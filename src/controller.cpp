@@ -1,11 +1,15 @@
 #include "controller.h"
 
 // ========================================================
-// Initialize all appropriate OpenGL variables, set
-// callback functions, and start the main event loop.
-// This function will not return but can be terminated
-// by calling 'exit(0)'
+// Initialize all appropriate variables, and ray-trace certain
+// pixels
 // ========================================================
+
+
+// Constructor
+Controller::Controller(ArgParser *_args, Mesh *_mesh, RayTracer *_raytracer, Image *_image) :
+  args(_args), mesh(_mesh), raytracer(_raytracer), image(_image) { SetCamera(); }
+
 
 // sets the camera position based on args
 void Controller::SetCamera() {
@@ -26,33 +30,37 @@ void Controller::SetCamera() {
   //get the actual camera direction
   direction -= position;
   direction.Normalize();
-  
+}
+
+
+// sets the camera position based on args
+Ray Controller::GetCameraRay(Vec2f point) {
   //M_PI?
   double angle = 20 * M_PI/180.0
   
-  //TODO: fix.  up = orientation
+  //Copy & paste from camera.cpp
   Vec3f screenCenter = position + direction;
+  Vec3f horizontal, screen_up;
+  Vec3f::Cross3(horizontal, direction, orientation);
+  Vec3f::Cross3(screen_up, horizontal, direction);
   double screenHeight = tan(angle/2.0);
-  Vec3f xAxis = getHorizontal() * 2 * screenHeight;
-  Vec3f yAxis = getScreenUp() * 2 * screenHeight;
-  Vec3f lowerLeft = screenCenter - (getScreenUp() * screenHeight) - (getHorizontal() * screenHeight);
+  Vec3f xAxis = horizontal * 2 * screenHeight;
+  Vec3f yAxis = screen_up * 2 * screenHeight;
+  Vec3f lowerLeft = screenCenter - (screen_up * screenHeight) - (horizontal * screenHeight);
   Vec3f screenPoint = lowerLeft + xAxis*point.x() + yAxis*point.y();
   Vec3f dir = screenPoint - position;
   dir.Normalize();
   return Ray(position,dir);
 }
 
-// trace a ray through pixel (i,j) of the image and return the color
-Ray Controller::TraceRay(double i, double j) {
-  // compute and set the pixel color
-  int max_d = max2(args->width,args->height);
-  double x = (i+0.5-args->width/2.0)/double(max_d)+0.5;
-  double y = (j+0.5-args->height/2.0)/double(max_d)+0.5;
 
-  Ray r = camera->generateRay(Vec2f(x,y));
+// trace a ray through pixel (x,y) of the image and return the color
+// TODO: convert that doubles to simple ints
+Vec3f Controller::TraceRay(double x, double y) {
+  // compute and set the pixel color
+  Ray r = camera->GetCameraRay(Vec2f(x,y));
   Hit hit;
   Vec3f color = raytracer->TraceRay(r,hit,args->num_bounces);
-  //RayTree::SetMainSegment(r,0,hit.getT());
   return color;
 }
 
@@ -60,25 +68,10 @@ Ray Controller::TraceRay(double i, double j) {
 // and then up to the top right.  Initially the image is sampled very
 // coarsely.  Increment the static variables that track the progress
 // through the scans
-int Controller::DrawPixel() {
-  if (raytracing_x > args->width) {
-    raytracing_x = raytracing_skip/2;
-    raytracing_y += raytracing_skip;
-  }
-  if (raytracing_y > args->height) {
-    if (raytracing_skip == 1) return 0;
-    raytracing_skip = raytracing_skip / 2;
-    if (raytracing_skip % 2 == 0) raytracing_skip++;
-    assert (raytracing_skip >= 1);
-    raytracing_x = raytracing_skip/2;
-    raytracing_y = raytracing_skip/2;
-    glEnd();
-    glPointSize(raytracing_skip);
-    glBegin(GL_POINTS);
-  }
-
+// TODO: convert that doubles to simple ints
+Color Controller::DrawPixel(double x, double y) {
   // compute the color and position of intersection
-  Vec3f color = TraceRay(raytracing_x, raytracing_y);
+  Vec3f color = TraceRay(x, y);
   double r = linear_to_srgb(color.x());
   double g = linear_to_srgb(color.y());
   double b = linear_to_srgb(color.z());
@@ -138,6 +131,9 @@ int Controller::DrawPixel() {
   }
     */
 
-void Controller::Render() {
+void Controller::PartialRender( int processor_rank, int num_processor ) {
+}
+
+void Controller::FullRender() {
 }
 
