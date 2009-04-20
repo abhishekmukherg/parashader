@@ -17,6 +17,6 @@ $(EXECUTABLE): $(SOURCES:.cpp=.o)
 	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@
 
 clean: 
-	rm -f $(SOURCES:.cpp=.d) $(SOURCES:.cpp=.o)
+	rm -f $(SOURCES:.cpp=.d) $(SOURCES:.cpp=.o) $(EXECUTABLE)
 
 .PHONY: clean
