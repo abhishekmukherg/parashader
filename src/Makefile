@@ -7,7 +7,7 @@ all: render
 	rm -f $@.$$$$
 
 
-SOURCES = camera.cpp edge.cpp face.cpp glCanvas.cpp image.cpp main.cpp material.cpp matrix.cpp mesh.cpp radiosity.cpp raytracer.cpp raytree.cpp sphere.cpp
+SOURCES = edge.cpp face.cpp image.cpp main.cpp material.cpp matrix.cpp mesh.cpp raytracer.cpp sphere.cpp
 EXECUTABLE = render
 LIBS = -lglut
 
