@@ -6,7 +6,7 @@ $ cmake .
 $ make
 
 To execute, run:
-./render -input OBJECT -output IMAGE [OPTIONS]...
+src/render -input OBJECT -output IMAGE [OPTIONS]...
 
 Where the options are:
 
