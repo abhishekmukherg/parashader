@@ -3,6 +3,8 @@
 #include "argparser.h"
 #include "mesh.h"
 #include "raytracer.h"
+#include "image.h"
+#include "controller.h"
 
 // =========================================
 // =========================================
@@ -25,12 +27,12 @@ int main(int argc, char *argv[]) {
   Image *image = new Image();
   image->Allocate( args->width, args->height );
 
-  Controller *controller = new Controller( args, mesh, raytracer, image );
+  Controller *controller = new Controller( args, raytracer, image );
   
   //Testing: doing full render of the image
   controller->FullRender();
   if( args->output_file ) {
-    if( !image->Save( std::string(output_file) ) ) status = 1
+    if( !image->Save( std::string(args->output_file) ) ) status = 1;
   }
 
   // well it never returns from the GLCanvas loop...

@@ -5,16 +5,16 @@
 // pixels
 // ========================================================
 
-
 // Constructor
-Controller::Controller(ArgParser *_args, Mesh *_mesh, RayTracer *_raytracer, Image *_image) :
-  args(_args), mesh(_mesh), raytracer(_raytracer), image(_image) { SetCamera(); }
+Controller::Controller(ArgParser *_args, RayTracer *_raytracer, Image *_image) :
+  args(_args), raytracer(_raytracer), image(_image) { SetCamera(); }
 
 
 // sets the camera position based on args
 void Controller::SetCamera() {
   //setup camera variables
   orientation = args->camera_orientation;
+  const Mesh *mesh = raytracer->getMesh();
   
   //if camera position and direction are at the same spot,
   //set camera to default.  Use "direction" as point-of-interest
@@ -36,7 +36,7 @@ void Controller::SetCamera() {
 // sets the camera position based on args
 Ray Controller::GetCameraRay(Vec2f point) {
   //M_PI?
-  double angle = 20 * M_PI/180.0
+  double angle = 20 * M_PI/180.0;
   
   //Copy & paste from camera.cpp
   Vec3f screenCenter = position + direction;
@@ -57,7 +57,7 @@ Ray Controller::GetCameraRay(Vec2f point) {
 // trace a ray through pixel (x,y) of the image and return the color
 Vec3f Controller::TraceRay(double x, double y) {
   // compute and set the pixel color
-  Ray r = camera->GetCameraRay(Vec2f(x,y));
+  Ray r = GetCameraRay(Vec2f(x,y));
   Hit hit;
   Vec3f color = raytracer->TraceRay(r,hit,args->num_bounces);
   return color;

@@ -7,29 +7,30 @@
 #include "image.h"
 #include "raytracer.h"
 #include "argparser.h"
+#include "mesh.h"
 
 class Controller {
 
 public:
 
-  Controller() : args(NULL), mesh(NULL), raytracer(NULL), image(NULL) {}
-  Controller(ArgParser *_args, Mesh *_mesh, RayTracer *_raytracer, Image *_image);
+  Controller() : args(NULL), raytracer(NULL), image(NULL) {}
+  Controller(ArgParser *_args, RayTracer *_raytracer, Image *_image);
   ~Controller() {}
   
   void PartialRender( int processor_rank, int num_processor );
   void FullRender();
+  void SetCamera();
 
 private:
 
   // various variables
   ArgParser *args;
-  Mesh *mesh;
+  //Mesh *mesh;
   RayTracer *raytracer;
   Image *image;
   Vec3f direction, position, orientation;
 
   // Callback functions for Render
-  void SetCamera();
   Ray GetCameraRay(Vec2f point);
   Vec3f TraceRay(double x, double y);
   Color DrawPixel(double x, double y);

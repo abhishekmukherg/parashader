@@ -7,7 +7,7 @@ all: render
 	rm -f $@.$$$$
 
 
-SOURCES = edge.cpp face.cpp image.cpp main.cpp material.cpp matrix.cpp mesh.cpp raytracer.cpp sphere.cpp
+SOURCES = edge.cpp face.cpp image.cpp main.cpp material.cpp matrix.cpp mesh.cpp raytracer.cpp sphere.cpp controller.cpp
 EXECUTABLE = render
 include $(SOURCES:.cpp=.d)
 $(EXECUTABLE): $(SOURCES:.cpp=.o)
