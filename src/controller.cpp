@@ -55,11 +55,15 @@ Ray Controller::GetCameraRay(Vec2f point) {
 
 
 // trace a ray through pixel (x,y) of the image and return the color
-Vec3f Controller::TraceRay(double x, double y) {
+Vec3f Controller::TraceRay(int x, int y) {
+  //translate pixel coordinates to screen coordinates
+  double xFill = 2 * ( double(x) / double(args->width) ) - 1;
+  double yFill = 2 * ( double(y) / double(args->height) ) - 1;
+  
   // compute and set the pixel color
-  Ray r = GetCameraRay(Vec2f(x,y));
+  Ray r = GetCameraRay( Vec2f( xFill, yFill ) );
   Hit hit;
-  Vec3f color = raytracer->TraceRay(r,hit,args->num_bounces);
+  Vec3f color = raytracer->TraceRay( r, hit, args->num_bounces );
   return color;
 }
 
@@ -68,19 +72,21 @@ Vec3f Controller::TraceRay(double x, double y) {
 // and then up to the top right.  Initially the image is sampled very
 // coarsely.  Increment the static variables that track the progress
 // through the scans
-Color Controller::DrawPixel(double x, double y) {
+Color Controller::DrawPixel(int x, int y) {
   // compute the color and position of intersection
   Vec3f color = TraceRay(x, y);
-  double r = linear_to_srgb(color.x()) * 255;
-  double g = linear_to_srgb(color.y()) * 255;
-  double b = linear_to_srgb(color.z()) * 255;
-  int red = (int) r;
-  int green = (int) g;
-  int blue = (int) b;
-  Color toFill = Color(red, green, blue);
-  int xFill = (int) x;
-  int yFill = (int) y;
-  image->SetPixel( xFill, yFill, toFill );
+  double r = linear_to_srgb(color.x()) * 255.0;
+  double g = linear_to_srgb(color.y()) * 255.0;
+  double b = linear_to_srgb(color.z()) * 255.0;
+  
+  //Make sure the r g b values are less than 255
+  if( r > 255 ) r = 255;
+  if( g > 255 ) g = 255;
+  if( b > 255 ) b = 255;
+  
+  //color image
+  Color toFill = Color( (int) r, (int) g, (int) b);
+  image->SetPixel( x, y, toFill );
   return toFill;
 }
 
@@ -88,12 +94,9 @@ Color Controller::DrawPixel(double x, double y) {
 //Creates a full image
 void Controller::FullRender() {
   int width = image->Width(), height = image->Height();
-  double x, y;
   for( int i = 0; i < width; ++i ) {
     for( int j = 0; j < height; ++j ) {
-      x = (double) i;
-      y = (double) j;
-      DrawPixel( x, y );
+      DrawPixel( i, j );
     }
   }
 }
@@ -105,14 +108,14 @@ void Controller::PartialRender( int processor_rank, int num_processor ) {
   int total_pixels = width * image->Height();
   int work_unit = total_pixels / num_processor;
   int end, start = work_unit * processor_rank;
-  double x, y;
+  int x, y;
   if( processor_rank == num_processor - 1 )
     end = total_pixels;
   else
     end = work_unit + start;
   for( int i = start; i < end; ++i ) {
-    x = (double) ( i % width );
-    y = (double) ( i / width );
+    x = i % width;
+    y = i / width;
     DrawPixel( x, y );
   }
 }

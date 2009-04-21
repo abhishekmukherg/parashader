@@ -32,8 +32,8 @@ private:
 
   // Callback functions for Render
   Ray GetCameraRay(Vec2f point);
-  Vec3f TraceRay(double x, double y);
-  Color DrawPixel(double x, double y);
+  Vec3f TraceRay(int x, int y);
+  Color DrawPixel(int x, int y);
 };
 
 #endif
