@@ -57,8 +57,8 @@ Ray Controller::GetCameraRay(Vec2f point) {
 // trace a ray through pixel (x,y) of the image and return the color
 Vec3f Controller::TraceRay(int x, int y) {
   //translate pixel coordinates to screen coordinates
-  double xFill = 2 * ( double(x) / double(args->width) ) - 1;
-  double yFill = 2 * ( double(y) / double(args->height) ) - 1;
+  double xFill = 2 * ( double(x) / double(args->width) ) - 0.5;
+  double yFill = 2 * ( double(y) / double(args->height) ) - 0.5;
   
   // compute and set the pixel color
   Ray r = GetCameraRay( Vec2f( xFill, yFill ) );

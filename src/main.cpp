@@ -17,8 +17,19 @@ int main(int argc, char *argv[]) {
   // "real" randomness
   //srand((unsigned)time(0));
 
+  //initialize parameters
   ArgParser *args = new ArgParser(argc, argv);
+  if ( !args->input_file) {
+    printf ( "ERROR! No input file provided.\n" );
+    status++;
+  }
+  if ( !args->output_file ) {
+    printf ( "ERROR! No output file provided.\n" );
+    status++;
+  }
+  if ( status ) return 0;
 
+  //initialize pointers
   Mesh *mesh = new Mesh();
   mesh->Load(args->input_file,args);
 
@@ -31,9 +42,8 @@ int main(int argc, char *argv[]) {
   
   //Testing: doing full render of the image
   controller->FullRender();
-  if( args->output_file ) {
-    if( !image->Save( std::string(args->output_file) ) ) status = 1;
-  }
+  if ( args->output_file )
+    status = (int) image->Save( std::string(args->output_file) );
 
   // well it never returns from the GLCanvas loop...
   delete controller;
