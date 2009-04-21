@@ -55,7 +55,6 @@ Ray Controller::GetCameraRay(Vec2f point) {
 
 
 // trace a ray through pixel (x,y) of the image and return the color
-// TODO: convert that doubles to simple ints
 Vec3f Controller::TraceRay(double x, double y) {
   // compute and set the pixel color
   Ray r = camera->GetCameraRay(Vec2f(x,y));
@@ -69,26 +68,53 @@ Vec3f Controller::TraceRay(double x, double y) {
 // and then up to the top right.  Initially the image is sampled very
 // coarsely.  Increment the static variables that track the progress
 // through the scans
-// TODO: convert that doubles to simple ints
 Color Controller::DrawPixel(double x, double y) {
   // compute the color and position of intersection
   Vec3f color = TraceRay(x, y);
-  double r = linear_to_srgb(color.x());
-  double g = linear_to_srgb(color.y());
-  double b = linear_to_srgb(color.z());
-  glColor3f(r,g,b);
-  double x = 2 * (raytracing_x/double(args->width)) - 1;
-  double y = 2 * (raytracing_y/double(args->height)) - 1;
-  glVertex3f(x,y,-1);
-  raytracing_x += raytracing_skip;
-  return 1;
+  double r = linear_to_srgb(color.x()) * 255;
+  double g = linear_to_srgb(color.y()) * 255;
+  double b = linear_to_srgb(color.z()) * 255;
+  int red = (int) r;
+  int green = (int) g;
+  int blue = (int) b;
+  Color toFill = Color(red, green, blue);
+  int xFill = (int) x;
+  int yFill = (int) y;
+  image->SetPixel( xFill, yFill, toFill );
+  return toFill;
 }
 
 
-void Controller::PartialRender( int processor_rank, int num_processor ) {
-}
-
-
+//Creates a full image
 void Controller::FullRender() {
+  int width = image->Width(), height = image->Height();
+  double x, y;
+  for( int i = 0; i < width; ++i ) {
+    for( int j = 0; j < height; ++j ) {
+      x = (double) i;
+      y = (double) j;
+      DrawPixel( x, y );
+    }
+  }
+}
+
+
+//Creates a partial image for MPI
+void Controller::PartialRender( int processor_rank, int num_processor ) {
+  int width = image->Width(), height = image->Height();
+  int total_pixels = width * height;
+  if( processor_rank == num_processor - 1 ) {
+    
+  } else {
+    
+  }
+  double x, y;
+  for( int i = 0; i < width; ++i ) {
+    for( int j = 0; j < height; ++j ) {
+      x = (double) i;
+      y = (double) j;
+      DrawPixel( x, y );
+    }
+  }
 }
 
