@@ -111,7 +111,7 @@ public:
 
   void DefaultValues() {
     input_file = NULL;
-	output_file = NULL;
+	  output_file = NULL;
     width = 100;
     height = 100;
     wireframe = false;

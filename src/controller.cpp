@@ -101,20 +101,19 @@ void Controller::FullRender() {
 
 //Creates a partial image for MPI
 void Controller::PartialRender( int processor_rank, int num_processor ) {
-  int width = image->Width(), height = image->Height();
-  int total_pixels = width * height;
-  if( processor_rank == num_processor - 1 ) {
-    
-  } else {
-    
-  }
+  int width = image->Width();
+  int total_pixels = width * image->Height();
+  int work_unit = total_pixels / num_processor;
+  int end, start = work_unit * processor_rank;
   double x, y;
-  for( int i = 0; i < width; ++i ) {
-    for( int j = 0; j < height; ++j ) {
-      x = (double) i;
-      y = (double) j;
-      DrawPixel( x, y );
-    }
+  if( processor_rank == num_processor - 1 )
+    end = total_pixels;
+  else
+    end = work_unit + start;
+  for( int i = start; i < end; ++i ) {
+    x = (double) ( i % width );
+    y = (double) ( i / width );
+    DrawPixel( x, y );
   }
 }
 
