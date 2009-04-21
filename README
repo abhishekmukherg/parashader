@@ -4,3 +4,62 @@ different computer/architecture run:
 
 $ cmake .
 $ make
+
+To execute, run:
+./render -input OBJECT -output IMAGE [OPTIONS]...
+
+Where the options are:
+
+-size W H
+	Sets width and height of image.
+
+	W and H are integer values.
+	Default is (100, 100).
+
+-num_shadow_samples N
+	Sets the number of times each ray will sample a
+	shadow.
+
+	Default is 0.
+
+-num_bounces N
+	Sets the number of times the ray can reflect off of
+	a reflective surface.
+
+	Default is 0.
+
+-num_glossy_samples N
+        Sets the number of times each ray will sample a
+	glossy surface.
+
+        Default is 0.
+
+-background_color R G B
+	Sets the background color, using the red, green,
+	and blue values.
+
+	R, G, and B are float values, betweeon 0 and 1.
+	Default is (1, 1, 1).
+
+-cam_pos X Y Z
+	Sets the camera position.
+
+	X, Y, and Z are float values.
+
+-cam_dir X Y Z
+	Sets the coordinates where the camera will be facing.
+	For example, if X, Y, and Z are 0's, the camera will
+	be looking at the center of the mesh.
+
+	X, Y, and Z are float values.
+
+	Note: if -cam_pos and -cam_dir are at the same coord-
+	inates, the camera will be placed at a default
+	position.
+
+
+-cam_ori X Y Z
+	Sets the camera's angle.
+
+	X, Y, and Z are float values.
+	Default is (0, 1, 0).
