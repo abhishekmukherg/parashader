@@ -25,10 +25,8 @@ private:
 
   // various variables
   ArgParser *args;
-  //Mesh *mesh;
   RayTracer *raytracer;
   Image *image;
-  //Vec3f direction, position, orientation;
   Vec3f position, lowerLeft, xAxis, yAxis;
   
   // Callback functions for Render

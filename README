@@ -57,7 +57,6 @@ Where the options are:
 	inates, the camera will be placed at a default
 	position.
 
-
 -cam_ori X Y Z
 	Sets the camera's angle.
 
