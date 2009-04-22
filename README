@@ -5,6 +5,8 @@ different computer/architecture run:
 $ cmake .
 $ make
 
+----
+
 To execute, run:
 src/render -input OBJECT -output IMAGE [OPTIONS]...
 
@@ -63,5 +65,31 @@ Where the options are:
 	X, Y, and Z are float values.
 	Default is (0, 1, 0).
 
--gray
+-gray R G B
 	Turns the image into a gray-scale instead of color.
+	R, G, and B sets the weight of each color's
+	contribution in shading.
+
+	R, G, and B are positive float values.
+	For "normal" gray-shading, use (0, 0, 0).
+
+-npr R G B
+	Filters red, green, and blue colors to output
+	only a limited range.
+
+	If a parameter is set to a value less than 0, or
+	greater than 255, the full color spectrum is used.
+	Ex: -npr -1 0 0 will output a red-scale of the
+	3D model
+
+	If a parameter is set to a value between 0 and 1,
+	the color will be outputed as a single shade.
+	Ex: -npr 1 0 0 will output a pure red image.
+
+	If a parameter is set to a values between 1 and 255,
+	the value sets the number of shades possible for
+	that color (including black).
+	Ex: -npr 3 0 0 will output 3 different shades of red.
+
+	R, G, and B are float values.
+	Default is (-1, -1, -1) (no NPR).
