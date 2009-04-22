@@ -11,6 +11,10 @@
 
 \usepackage{parskip}
 
+%%Taro: inserting urls
+
+\usepackage{url} 
+
 %% Optional: the 'caption' package provides a nicer-looking replacement
 %% for the standard caption environment. With 'labelfont=bf,'textfont=it',
 %% caption labels are bold and caption text is italic.
@@ -68,14 +72,59 @@ Graphics.  Various measurements will be used to test the performance of our
 program: the number of processors, number of models and texture, number of time
 rays can bounce, and number of samples for shadows.
 
-In addition, a few extensions were added to create several filters not unlike
-those found in many general-use image editors. With a little tweaking, we
-can give certain graphics an artistic taste.
+In addition, a few extensions were added to create several filters similar to
+those found in image editors such as Adobe Photoshop. With a little tweaking, we
+can give graphics a bit of an artistic taste.
 
 \section{Parallelism}
 TODO
 
 \section{Filters}
+In an image editor, a filter is an algorithm that converts the pixel values to
+a new pixel to either remove unwanted artifacts or add an artistic taste to an
+image.  Often, in an image, a pixel is reperesented by a red, green, and blue
+value each corresponding to additive colors in lights.  Using these values,
+we can recalculate and compile a new image that gives a different impression
+from the original.
+
+In this case, we created a gray-scale filter and a hard-shading filter
+that recalculates the generated pixel value from each ray in the ray-tracer.
+
+\section*{Gray Scale}
+Each pixel in a gray scale image is reperesented, frequently, by a single
+gamma value that reperesents a shade of gray.  Finding the gamma from an
+RGB value is, incidently, very simple.  We simply have to find the weighted
+acerage of each value:
+
+$\gamma = W_{r}R + W_{g}G + W_{b}B$
+
+Where $1 = W_{r} + W_{g} + W_{b}$
+
+One can easily convert this back to the RGB format by setting the red,
+green, and blue value equal to \gamma.  It's worth noting that the weight
+values must be carefully chosen, as it reperesents each color's contribution
+to the image.  For example, if we naively give equal weights to red, green,
+and blue, we get an overly-lit image.
+%TODO: add an image of overly-lit image
+
+To create the most acceptable color-to-gray-scale conversion, we used
+the weight values from
+\url{www.mathworks.com/support/solutions/data/1-1ASCU.html}.
+
+$W_{r}R = 0.299$
+
+$W_{g}G = 0.587$
+
+$W_{b}B = 0.114$
+%TODO: add an image of gray scale image
+
+\section*{Hard Shading}
+TODO
+
+\section{Conclusion}
+TODO
+
+\section{Further Work}
 TODO
 
 \section*{Related Works}
