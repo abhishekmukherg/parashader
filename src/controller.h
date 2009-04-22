@@ -26,6 +26,7 @@ public:
 
 	void Output(Image &out);
 	void Output(std::ostream &out);
+	const unsigned char *GetOutputStream() const;
 
 private:
 

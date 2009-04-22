@@ -5,11 +5,15 @@
 #include "raytracer.h"
 #include "image.h"
 #include "controller.h"
+#include <mpi.h>
+
+const int COMBINE_RANK = 0;
 
 // =========================================
 // =========================================
 
 int main(int argc, char *argv[]) {
+	MPI::Init(argc, argv);
   int status = 0;
   
   // deterministic (repeatable) randomness
@@ -33,18 +37,42 @@ int main(int argc, char *argv[]) {
   mesh.Load(args.input_file,&args);
   RayTracer raytracer(&mesh,&args);
 
-  Controller controller( &args, &raytracer );
+	const int nrank = MPI::COMM_WORLD.Get_rank();
+	const int npes = MPI::COMM_WORLD.Get_size();
+  Controller controller( &args, &raytracer, nrank, npes );
   controller.FullRender();
 
-  Image image;
-  image.Allocate( args.width, args.height );
-  controller.Output(image);
-  if ( args.output_file )
+	unsigned char *combined_output;
+	uintmax_t outsize = (args.width * args.height) * 3;
+	if (nrank == COMBINE_RANK)
+		combined_output = new unsigned char[outsize];
+
+	const unsigned char *mydata = controller.GetOutputStream();
+	MPI::COMM_WORLD.Gather(
+			mydata,
+			((args.width * args.height)/npes) * 3, MPI::UNSIGNED_CHAR,
+			(combined_output),
+			outsize, MPI::UNSIGNED_CHAR,
+			COMBINE_RANK);
+
+	delete [] mydata;
+
+	if (nrank == COMBINE_RANK) {
+		printf("got data");
+		Image image;
+		image.Allocate( args.width, args.height );
+		controller.Output(image);
+		if ( args.output_file )
     status = (int) image.Save( std::string(args.output_file) );
+	} else {
+		status = 0;
+	}
 
   // well it never returns from the GLCanvas loop...
+	MPI::Finalize();
   return status;
 }
 
 // =========================================
 // =========================================
+// vim: ts=2:sw=2

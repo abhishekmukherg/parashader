@@ -20,6 +20,18 @@ Controller::~Controller()
   delete[] output;
 }
 
+const unsigned char *Controller::GetOutputStream() const
+{
+  const size_t size = ((pixelcount/processor_count) + 1);
+  unsigned char *data = new unsigned char[size * 3];
+  for (size_t i = 0; i < size; ++i) {
+    data[(i * 3)] = output[i].r;
+    data[(i * 3) + 1] = output[i].g;
+    data[(i * 3) + 2] = output[i].b;
+  }
+  return data;
+}
+
 
 // sets the camera position based on args
 void Controller::SetCamera() {
