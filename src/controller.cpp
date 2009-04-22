@@ -10,6 +10,7 @@ Controller::Controller(ArgParser *_args, RayTracer *_raytracer,
   args(_args), raytracer(_raytracer), processor_count(npes), curr_proc(nrank)
 {
 	SetCamera();
+  SetExtensions();
 	pixelcount = args->width * args->height;
 	output = new Color[(pixelcount/processor_count) + 1];
 }
@@ -139,12 +140,25 @@ void Controller::Output(std::ostream &out) {
 	}
 }
 
+
+void Controller::SetExtensions() {
+  //Set member variables from args values
+  Vec3f temp = args->npr;
+  splitRed = temp.x();
+  splitGreen = temp.y();
+  splitBlue = temp.z();
+  temp = args->gray_scale;
+  redWeight = temp.x();
+  greenWeight = temp.y();
+  blueWeight = temp.z();
+}
+
+
 //Non-photorealistic filter
 void Controller::NPR(double &r, double &g, double &b) {
-  double splitRed = args->npr.x();
-  double splitGreen = args->npr.y();
-  double splitBlue = args->npr.z();
   double setColor, divideColor, index;
+  
+  //set red
   if( splitRed >= 0 && splitRed <= 1 ) {
     r = splitRed * 255;
   } else if( splitRed > 1 && splitRed < 255 ) {
@@ -160,6 +174,8 @@ void Controller::NPR(double &r, double &g, double &b) {
       }
     }
   }
+  
+  //set green
   if( splitGreen >= 0 && splitGreen <= 1 ) {
     g = splitGreen * 255;
   } else if( splitGreen > 1 && splitGreen < 255 ) {
@@ -175,6 +191,8 @@ void Controller::NPR(double &r, double &g, double &b) {
       }
     }
   }
+  
+  //set blue
   if( splitBlue >= 0 && splitBlue <= 1 ) {
     b = splitBlue * 255;
   } else if( splitBlue > 1 && splitBlue < 255 ) {
@@ -195,9 +213,7 @@ void Controller::NPR(double &r, double &g, double &b) {
 
 //Gray-scale filter
 void Controller::GrayScale(double &r, double &g, double &b) {
-  //gray-scaling algorithm from
-  //http://www.mathworks.com/support/solutions/data/1-1ASCU.html
-  if( args->gray_scale )
-    r = g = b = r * 0.299 + g * 0.587 + b * 0.114;
+  if( args->gray_scale.Length() != 0 )
+    r = g = b = r * redWeight + g * greenWeight + b * blueWeight;
 }
 

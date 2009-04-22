@@ -100,7 +100,21 @@ public:
          double z = atof(argv[i]);
          npr = Vec3f(x,y,z);
       } else if (!strcmp(argv[i],"-gray")) {
-        gray_scale = true;
+        i++; assert (i < argc);
+        double x = atof(argv[i]);
+        assert (x >= 0);
+        i++; assert (i < argc);
+        double y = atof(argv[i]);
+        assert (y >= 0);
+        i++; assert (i < argc);
+        double z = atof(argv[i]);
+        assert (z >= 0);
+        gray_scale = Vec3f(x,y,z);
+        //default the gray scales
+        if( gray_scale.Length() == 0 )
+          gray_scale.Set( 0.299, 0.587, 0.114 );
+        else
+          gray_scale.Normalize();
       } else if (!strcmp(argv[i],"-ambient")) {
 	i++; assert (i < argc);
          double r = atof(argv[i]);
@@ -147,7 +161,7 @@ public:
       Vec3f(srgb_to_linear(ambient_light.r()),
 	    srgb_to_linear(ambient_light.g()),
 	    srgb_to_linear(ambient_light.b()));
-    gray_scale = false;
+    gray_scale = Vec3f(0,0,0);
   }
 
   // ==============
@@ -163,7 +177,6 @@ public:
   enum RENDER_MODE render_mode;
   bool raytracing_animation;
   bool radiosity_animation;
-  bool gray_scale;
 
   Vec3f ambient_light;
   Vec3f ambient_light_linear;
@@ -173,6 +186,7 @@ public:
   Vec3f camera_orientation;
   Vec3f background_color_linear;
   Vec3f npr;
+  Vec3f gray_scale;
 
   int num_bounces;
   int num_shadow_samples;

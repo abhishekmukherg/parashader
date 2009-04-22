@@ -22,6 +22,7 @@ public:
   void PartialRender( int processor_rank, int num_processor );
   void FullRender();
   void SetCamera();
+  void SetExtensions();
 
 	void Output(Image &out);
 	void Output(std::ostream &out);
@@ -44,6 +45,8 @@ private:
   Color DrawPixel(int x, int y);
   
   //Taro's random extensions
+  double splitRed, splitGreen, splitBlue,
+    redWeight, greenWeight, blueWeight;
   void NPR(double &red, double &green, double &blue);
   void GrayScale(double &red, double &green, double &blue);
 };
