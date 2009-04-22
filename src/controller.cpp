@@ -144,20 +144,51 @@ void Controller::NPR(double &r, double &g, double &b) {
   double splitRed = args->npr.x();
   double splitGreen = args->npr.y();
   double splitBlue = args->npr.z();
+  double setColor, divideColor, index;
   if( splitRed >= 0 && splitRed <= 1 ) {
     r = splitRed * 255;
   } else if( splitRed > 1 && splitRed < 255 ) {
-    //TODO
+    //Select how the colors will be divided
+    setColor = 255 / ( splitRed - 1 );
+    divideColor = 255 / splitRed;
+    
+    //figure out the range the color falls in
+    for( index = 0; index < splitRed; ++index ) {
+      if( r < ( index + 1 ) * divideColor ) {
+        r = setColor * index;
+        break;
+      }
+    }
   }
   if( splitGreen >= 0 && splitGreen <= 1 ) {
     g = splitGreen * 255;
   } else if( splitGreen > 1 && splitGreen < 255 ) {
-    //TODO
+    //Select how the colors will be divided
+    setColor = 255 / ( splitGreen - 1 );
+    divideColor = 255 / splitGreen;
+    
+    //figure out the range the color falls in
+    for( index = 0; index < splitGreen; ++index ) {
+      if( g < ( index + 1 ) * divideColor ) {
+        g = setColor * index;
+        break;
+      }
+    }
   }
   if( splitBlue >= 0 && splitBlue <= 1 ) {
     b = splitBlue * 255;
   } else if( splitBlue > 1 && splitBlue < 255 ) {
-    //TODO
+    //Select how the colors will be divided
+    setColor = 255 / ( splitBlue - 1 );
+    divideColor = 255 / splitBlue;
+    
+    //figure out the range the color falls in
+    for( index = 0; index < splitBlue; ++index ) {
+      if( b < ( index + 1 ) * divideColor ) {
+        b = setColor * index;
+        break;
+      }
+    }
   }
 }
 
