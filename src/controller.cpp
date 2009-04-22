@@ -38,7 +38,7 @@ void Controller::SetCamera() {
   
   xAxis = horizontal * 2;
   yAxis = screenUp * 2;
-  lowerLeft = position + direction - screenUp - horizontal;
+  lowerLeft = position + direction - horizontal - screenUp;
 }
 
 
@@ -53,10 +53,10 @@ Ray Controller::GetCameraRay(double x, double y) {
 
 
 // trace a ray through pixel (x,y) of the image and return the color
-Vec3f Controller::TraceRay(int x, int y) {
+Vec3f Controller::TraceRay(double x, double y) {
   //translate pixel coordinates to screen coordinates
-  double xFill = 2 * ( double(x) / double(args->width) ) - 0.5;
-  double yFill = 2 * ( double(y) / double(args->height) ) - 0.5;
+  double xFill = x / double(args->width);
+  double yFill = y / double(args->height);
   
   // compute and set the pixel color
   Ray r = GetCameraRay( xFill, yFill );
@@ -84,7 +84,7 @@ Color Controller::DrawPixel(int x, int y) {
   
   //color image
   Color toFill = Color( (int) r, (int) g, (int) b);
-  image->SetPixel( x, y, toFill );
+  image->SetPixel( double(x), double(y), toFill );
   return toFill;
 }
 
