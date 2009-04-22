@@ -6,18 +6,18 @@
 
 // Constructor
 Controller::Controller(ArgParser *_args, RayTracer *_raytracer,
-		int nrank, int npes) :
+    int nrank, int npes) :
   args(_args), raytracer(_raytracer), processor_count(npes), curr_proc(nrank)
 {
-	SetCamera();
+  SetCamera();
   SetExtensions();
-	pixelcount = args->width * args->height;
-	output = new Color[(pixelcount/processor_count) + 1];
+  pixelcount = args->width * args->height;
+  output = new Color[(pixelcount/processor_count) + 1];
 }
 
 Controller::~Controller()
 {
-	delete[] output;
+  delete[] output;
 }
 
 
@@ -34,7 +34,7 @@ void Controller::SetCamera() {
     direction = args->camera_direction;
     position = args->camera_position;
   }
-  
+
   //get the actual camera direction
   direction -= position;
   direction.Normalize();
@@ -46,7 +46,7 @@ void Controller::SetCamera() {
   double screenHeight = tan(20 * M_PI / 180.0 / 2.0);
   horizontal *= screenHeight;
   screenUp *= screenHeight;
-  
+
   xAxis = horizontal * 2;
   yAxis = screenUp * 2;
   lowerLeft = position + direction - horizontal - screenUp;
@@ -57,7 +57,7 @@ void Controller::SetCamera() {
 Ray Controller::GetCameraRay(double x, double y) {
   Vec3f dir = lowerLeft + xAxis * x + yAxis * y - position;
   dir.Normalize();
-  
+
   //need dir, position
   return Ray( position, dir );
 }
@@ -68,7 +68,7 @@ Vec3f Controller::TraceRay(double x, double y) {
   //translate pixel coordinates to screen coordinates
   double xFill = x / double(args->width);
   double yFill = y / double(args->height);
-  
+
   // compute and set the pixel color
   Ray r = GetCameraRay( xFill, yFill );
   Hit hit;
@@ -87,20 +87,20 @@ Color Controller::DrawPixel(int x, int y) {
   double r = linear_to_srgb(color.x()) * 255;
   double g = linear_to_srgb(color.y()) * 255;
   double b = linear_to_srgb(color.z()) * 255;
-  
+
   //Taro's random extensions
   NPR(r,g,b);
   GrayScale(r,g,b);
-  
+
   //Make sure the r g b values are less than 255
   if( r > 255 ) r = 255;
   if( g > 255 ) g = 255;
   if( b > 255 ) b = 255;
-  
+
   //color image
   Color toFill = Color( static_cast<int>(r),
-												static_cast<int>(g),
-												static_cast<int>(b));
+      static_cast<int>(g),
+      static_cast<int>(b));
   return toFill;
 }
 
@@ -108,36 +108,36 @@ Color Controller::DrawPixel(int x, int y) {
 //Creates a full image
 void Controller::FullRender() {
   const int width = args->width;
-	Color *c = output;
-	for( uintmax_t pixel = curr_proc;
-					pixel < pixelcount;
-					pixel += processor_count) {
-		const int x = pixel % width;
-		const int y = pixel / width;
-		*c++ = DrawPixel( y, x );
+  Color *c = output;
+  for( uintmax_t pixel = curr_proc;
+      pixel < pixelcount;
+      pixel += processor_count) {
+    const int x = pixel % width;
+    const int y = pixel / width;
+    *c++ = DrawPixel( y, x );
   }
 }
 
 void Controller::Output(Image &out) {
-	const int width = args->width;
-	const int height = args->height;
-	const Color *c = output;
-	for( int i = 0; i < width; ++i ) {
-		for( int j = 0; j < height; ++j ) {
-			out.SetPixel(i, j, *c++);
-		}
-	}
+  const int width = args->width;
+  const int height = args->height;
+  const Color *c = output;
+  for( int i = 0; i < width; ++i ) {
+    for( int j = 0; j < height; ++j ) {
+      out.SetPixel(i, j, *c++);
+    }
+  }
 }
 
 void Controller::Output(std::ostream &out) {
-	const Color *c = output;
-	for( uintmax_t pixel = curr_proc;
-					pixel < pixelcount;
-					pixel += processor_count) {
-		out << static_cast<int>(c->r)
-					<< " " << static_cast<int>(c->g)
-					<< " " << static_cast<int>(c->b) << std::endl;
-	}
+  const Color *c = output;
+  for( uintmax_t pixel = curr_proc;
+      pixel < pixelcount;
+      pixel += processor_count) {
+    out << static_cast<int>(c->r)
+      << " " << static_cast<int>(c->g)
+      << " " << static_cast<int>(c->b) << std::endl;
+  }
 }
 
 
@@ -157,7 +157,7 @@ void Controller::SetExtensions() {
 //Non-photorealistic filter
 void Controller::NPR(double &r, double &g, double &b) {
   double setColor, divideColor, index;
-  
+
   //set red
   if( splitRed >= 0 && splitRed <= 1 ) {
     r = splitRed * 255;
@@ -165,7 +165,7 @@ void Controller::NPR(double &r, double &g, double &b) {
     //Select how the colors will be divided
     setColor = 255 / ( splitRed - 1 );
     divideColor = 255 / splitRed;
-    
+
     //figure out the range the color falls in
     for( index = 0; index < splitRed; ++index ) {
       if( r < ( index + 1 ) * divideColor ) {
@@ -174,7 +174,7 @@ void Controller::NPR(double &r, double &g, double &b) {
       }
     }
   }
-  
+
   //set green
   if( splitGreen >= 0 && splitGreen <= 1 ) {
     g = splitGreen * 255;
@@ -182,7 +182,7 @@ void Controller::NPR(double &r, double &g, double &b) {
     //Select how the colors will be divided
     setColor = 255 / ( splitGreen - 1 );
     divideColor = 255 / splitGreen;
-    
+
     //figure out the range the color falls in
     for( index = 0; index < splitGreen; ++index ) {
       if( g < ( index + 1 ) * divideColor ) {
@@ -191,7 +191,7 @@ void Controller::NPR(double &r, double &g, double &b) {
       }
     }
   }
-  
+
   //set blue
   if( splitBlue >= 0 && splitBlue <= 1 ) {
     b = splitBlue * 255;
@@ -199,7 +199,7 @@ void Controller::NPR(double &r, double &g, double &b) {
     //Select how the colors will be divided
     setColor = 255 / ( splitBlue - 1 );
     divideColor = 255 / splitBlue;
-    
+
     //figure out the range the color falls in
     for( index = 0; index < splitBlue; ++index ) {
       if( b < ( index + 1 ) * divideColor ) {
@@ -212,8 +212,9 @@ void Controller::NPR(double &r, double &g, double &b) {
 
 
 //Gray-scale filter
-void Controller::GrayScale(double &r, double &g, double &b) {
-  if( args->gray_scale.Length() != 0 )
-    r = g = b = r * redWeight + g * greenWeight + b * blueWeight;
-}
+  void Controller::GrayScale(double &r, double &g, double &b) {
+    if( args->gray_scale.Length() != 0 )
+      r = g = b = r * redWeight + g * greenWeight + b * blueWeight;
+  }
 
+// vim: ts=2:sw=2:expandtab
