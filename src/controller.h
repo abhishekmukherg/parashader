@@ -33,6 +33,9 @@ private:
   Ray GetCameraRay(double x, double y);
   Vec3f TraceRay(double x, double y);
   Color DrawPixel(int x, int y);
+  
+  //Taro's random extensions
+  //void GrayScale(double &r, double &g, double &b);
 };
 
 #endif

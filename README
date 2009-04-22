@@ -62,3 +62,6 @@ Where the options are:
 
 	X, Y, and Z are float values.
 	Default is (0, 1, 0).
+
+-gray
+	Turns the image into a gray-scale instead of color.

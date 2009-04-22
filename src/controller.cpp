@@ -72,10 +72,17 @@ Vec3f Controller::TraceRay(double x, double y) {
 // through the scans
 Color Controller::DrawPixel(int x, int y) {
   // compute the color and position of intersection
-  Vec3f color = TraceRay(x, y);
+  Vec3f color = TraceRay( double(x), double(y) );
   double r = linear_to_srgb(color.x()) * 255.0;
   double g = linear_to_srgb(color.y()) * 255.0;
   double b = linear_to_srgb(color.z()) * 255.0;
+  
+  //Taro's random extensions
+  if( args->gray_scale ) {
+    //gray-scaling algorithm from
+    //http://www.mathworks.com/support/solutions/data/1-1ASCU.html
+    r = g = b = r * 0.299 + g * 0.587 + b * 0.114;
+  }
   
   //Make sure the r g b values are less than 255
   if( r > 255 ) r = 255;
@@ -84,7 +91,7 @@ Color Controller::DrawPixel(int x, int y) {
   
   //color image
   Color toFill = Color( (int) r, (int) g, (int) b);
-  image->SetPixel( double(x), double(y), toFill );
+  image->SetPixel( x, y, toFill );
   return toFill;
 }
 

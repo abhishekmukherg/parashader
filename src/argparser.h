@@ -91,6 +91,8 @@ public:
            camera_orientation.Set( 0, 1, 0 );
          else
            camera_orientation.Normalize();
+      } else if (!strcmp(argv[i],"-gray")) {
+        gray_scale = true;
       } else if (!strcmp(argv[i],"-ambient")) {
 	i++; assert (i < argc);
          double r = atof(argv[i]);
@@ -136,6 +138,7 @@ public:
       Vec3f(srgb_to_linear(ambient_light.r()),
 	    srgb_to_linear(ambient_light.g()),
 	    srgb_to_linear(ambient_light.b()));
+    gray_scale = false;
   }
 
   // ==============
@@ -151,6 +154,7 @@ public:
   enum RENDER_MODE render_mode;
   bool raytracing_animation;
   bool radiosity_animation;
+  bool gray_scale;
 
   Vec3f ambient_light;
   Vec3f ambient_light_linear;
