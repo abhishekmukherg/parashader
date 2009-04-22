@@ -1,17 +1,17 @@
 #include "controller.h"
-
 // ========================================================
 // Initialize all appropriate variables, and ray-trace certain
 // pixels
 // ========================================================
 
 // Constructor
-Controller::Controller(ArgParser *_args, RayTracer *_raytracer) :
-  args(_args), raytracer(_raytracer)
+Controller::Controller(ArgParser *_args, RayTracer *_raytracer,
+		int nrank, int npes) :
+  args(_args), raytracer(_raytracer), processor_count(npes), curr_proc(nrank)
 {
 	SetCamera();
 	pixelcount = args->width * args->height;
-	output = new Color[pixelcount];
+	output = new Color[(pixelcount/processor_count) + 1];
 }
 
 Controller::~Controller()
@@ -93,19 +93,23 @@ Color Controller::DrawPixel(int x, int y) {
   if( b > 255 ) b = 255;
   
   //color image
-  Color toFill = Color( (int) r, (int) g, (int) b);
-	output[x * args->width + y] = toFill;
+  Color toFill = Color( static_cast<int>(r),
+												static_cast<int>(g),
+												static_cast<int>(b));
   return toFill;
 }
 
 
 //Creates a full image
 void Controller::FullRender() {
-  const int width = args->width, height = args->height;
-  for( int i = 0; i < width; ++i ) {
-    for( int j = 0; j < height; ++j ) {
-      DrawPixel( i, j );
-    }
+  const int width = args->width;
+	Color *c = output;
+	for( uintmax_t pixel = curr_proc;
+					pixel < pixelcount;
+					pixel += processor_count) {
+		const int x = pixel % width;
+		const int y = pixel / width;
+		*c++ = DrawPixel( y, x );
   }
 }
 
@@ -117,6 +121,17 @@ void Controller::Output(Image &out) {
 		for( int j = 0; j < height; ++j ) {
 			out.SetPixel(i, j, *c++);
 		}
+	}
+}
+
+void Controller::Output(std::ostream &out) {
+	const Color *c = output;
+	for( uintmax_t pixel = curr_proc;
+					pixel < pixelcount;
+					pixel += processor_count) {
+		out << static_cast<int>(c->r)
+					<< " " << static_cast<int>(c->g)
+					<< " " << static_cast<int>(c->b) << std::endl;
 	}
 }
 
