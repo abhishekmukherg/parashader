@@ -1,4 +1,5 @@
 #include <cstring>
+#include <iostream>
 #include "image.h"
 
 bool Image::Save(const std::string &filename) const {
