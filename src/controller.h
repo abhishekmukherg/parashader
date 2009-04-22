@@ -28,10 +28,11 @@ private:
   //Mesh *mesh;
   RayTracer *raytracer;
   Image *image;
-  Vec3f direction, position, orientation;
-
+  //Vec3f direction, position, orientation;
+  Vec3f position, lowerLeft, xAxis, yAxis;
+  
   // Callback functions for Render
-  Ray GetCameraRay(Vec2f point);
+  Ray GetCameraRay(double x, double y);
   Vec3f TraceRay(int x, int y);
   Color DrawPixel(int x, int y);
 };

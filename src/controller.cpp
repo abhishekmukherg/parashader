@@ -12,16 +12,13 @@ Controller::Controller(ArgParser *_args, RayTracer *_raytracer, Image *_image) :
 
 // sets the camera position based on args
 void Controller::SetCamera() {
-  //setup camera variables
-  orientation = args->camera_orientation;
-  const Mesh *mesh = raytracer->getMesh();
-  
   //if camera position and direction are at the same spot,
   //set camera to default.  Use "direction" as point-of-interest
+  Vec3f direction;
   if( args->camera_position == args->camera_direction ) {
-    direction = mesh->getBoundingBox()->getCenter();
-    double max_dim = mesh->getBoundingBox()->maxDim();
-    position = direction + Vec3f(0,0,4*max_dim);
+    const BoundingBox *coord = raytracer->getMesh()->getBoundingBox();
+    direction = coord->getCenter();
+    position = direction + Vec3f( 0, 0, 4 * coord->maxDim() );
   } else {
     direction = args->camera_direction;
     position = args->camera_position;
@@ -30,27 +27,28 @@ void Controller::SetCamera() {
   //get the actual camera direction
   direction -= position;
   direction.Normalize();
+
+  //Copy & paste from camera.cpp
+  Vec3f horizontal, screenUp;
+  Vec3f::Cross3(horizontal, direction, args->camera_orientation);
+  Vec3f::Cross3(screenUp, horizontal, direction);
+  double screenHeight = tan(20 * M_PI / 180.0 / 2.0);
+  horizontal *= screenHeight;
+  screenUp *= screenHeight;
+  
+  xAxis = horizontal * 2;
+  yAxis = screenUp * 2;
+  lowerLeft = position + direction - screenUp - horizontal;
 }
 
 
 // sets the camera position based on args
-Ray Controller::GetCameraRay(Vec2f point) {
-  //M_PI?
-  double angle = 20 * M_PI/180.0;
-  
-  //Copy & paste from camera.cpp
-  Vec3f screenCenter = position + direction;
-  Vec3f horizontal, screen_up;
-  Vec3f::Cross3(horizontal, direction, orientation);
-  Vec3f::Cross3(screen_up, horizontal, direction);
-  double screenHeight = tan(angle/2.0);
-  Vec3f xAxis = horizontal * 2 * screenHeight;
-  Vec3f yAxis = screen_up * 2 * screenHeight;
-  Vec3f lowerLeft = screenCenter - (screen_up * screenHeight) - (horizontal * screenHeight);
-  Vec3f screenPoint = lowerLeft + xAxis*point.x() + yAxis*point.y();
-  Vec3f dir = screenPoint - position;
+Ray Controller::GetCameraRay(double x, double y) {
+  Vec3f dir = lowerLeft + xAxis * x + yAxis * y - position;
   dir.Normalize();
-  return Ray(position,dir);
+  
+  //need dir, position
+  return Ray( position, dir );
 }
 
 
@@ -61,7 +59,7 @@ Vec3f Controller::TraceRay(int x, int y) {
   double yFill = 2 * ( double(y) / double(args->height) ) - 0.5;
   
   // compute and set the pixel color
-  Ray r = GetCameraRay( Vec2f( xFill, yFill ) );
+  Ray r = GetCameraRay( xFill, yFill );
   Hit hit;
   Vec3f color = raytracer->TraceRay( r, hit, args->num_bounces );
   return color;
