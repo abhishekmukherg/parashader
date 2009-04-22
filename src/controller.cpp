@@ -6,8 +6,18 @@
 // ========================================================
 
 // Constructor
-Controller::Controller(ArgParser *_args, RayTracer *_raytracer, Image *_image) :
-  args(_args), raytracer(_raytracer), image(_image) { SetCamera(); }
+Controller::Controller(ArgParser *_args, RayTracer *_raytracer) :
+  args(_args), raytracer(_raytracer)
+{
+	SetCamera();
+	pixelcount = args->width * args->height;
+	output = new Color[pixelcount];
+}
+
+Controller::~Controller()
+{
+	delete[] output;
+}
 
 
 // sets the camera position based on args
@@ -84,14 +94,14 @@ Color Controller::DrawPixel(int x, int y) {
   
   //color image
   Color toFill = Color( (int) r, (int) g, (int) b);
-  image->SetPixel( double(x), double(y), toFill );
+	output[x * args->width + y] = toFill;
   return toFill;
 }
 
 
 //Creates a full image
 void Controller::FullRender() {
-  int width = image->Width(), height = image->Height();
+  const int width = args->width, height = args->height;
   for( int i = 0; i < width; ++i ) {
     for( int j = 0; j < height; ++j ) {
       DrawPixel( i, j );
@@ -99,23 +109,15 @@ void Controller::FullRender() {
   }
 }
 
-
-//Creates a partial image for MPI
-void Controller::PartialRender( int processor_rank, int num_processor ) {
-  int width = image->Width();
-  int total_pixels = width * image->Height();
-  int work_unit = total_pixels / num_processor;
-  int end, start = work_unit * processor_rank;
-  int x, y;
-  if( processor_rank == num_processor - 1 )
-    end = total_pixels;
-  else
-    end = work_unit + start;
-  for( int i = start; i < end; ++i ) {
-    x = i % width;
-    y = i / width;
-    DrawPixel( x, y );
-  }
+void Controller::Output(Image &out) {
+	const int width = args->width;
+	const int height = args->height;
+	const Color *c = output;
+	for( int i = 0; i < width; ++i ) {
+		for( int j = 0; j < height; ++j ) {
+			out.SetPixel(i, j, *c++);
+		}
+	}
 }
 
 // vim: ts=2:sw=2

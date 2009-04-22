@@ -18,39 +18,31 @@ int main(int argc, char *argv[]) {
   //srand((unsigned)time(0));
 
   //initialize parameters
-  ArgParser *args = new ArgParser(argc, argv);
-  if ( !args->input_file) {
+  ArgParser args(argc, argv);
+  if ( !args.input_file) {
     printf ( "ERROR! No input file provided.\n" );
     status++;
   }
-  if ( !args->output_file ) {
+  if ( !args.output_file ) {
     printf ( "ERROR! No output file provided.\n" );
     status++;
   }
   if ( status ) return 0;
 
-  //initialize pointers
-  Mesh *mesh = new Mesh();
-  mesh->Load(args->input_file,args);
+  Mesh mesh;
+  mesh.Load(args.input_file,&args);
+  RayTracer raytracer(&mesh,&args);
 
-  RayTracer *raytracer = new RayTracer(mesh,args);
+  Controller controller( &args, &raytracer );
+  controller.FullRender();
 
-  Image *image = new Image();
-  image->Allocate( args->width, args->height );
-
-  Controller *controller = new Controller( args, raytracer, image );
-  
-  //Testing: doing full render of the image
-  controller->FullRender();
-  if ( args->output_file )
-    status = (int) image->Save( std::string(args->output_file) );
+  Image image;
+  image.Allocate( args.width, args.height );
+  controller.Output(image);
+  if ( args.output_file )
+    status = (int) image.Save( std::string(args.output_file) );
 
   // well it never returns from the GLCanvas loop...
-  delete controller;
-  delete raytracer;
-  delete image;
-  delete mesh;
-  delete args;
   return status;
 }
 

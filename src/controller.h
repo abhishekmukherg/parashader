@@ -12,14 +12,17 @@
 class Controller {
 
 public:
+  Controller(ArgParser *_args, RayTracer *_raytracer);
+  ~Controller();
 
-  Controller() : args(NULL), raytracer(NULL), image(NULL) {}
-  Controller(ArgParser *_args, RayTracer *_raytracer, Image *_image);
-  ~Controller() {}
+	const Controller &operator=(const Controller &rhs);
+	Controller(const Controller &rhs);
   
   void PartialRender( int processor_rank, int num_processor );
   void FullRender();
   void SetCamera();
+
+	void Output(Image &out);
 
 private:
 
@@ -27,9 +30,11 @@ private:
   ArgParser *args;
   //Mesh *mesh;
   RayTracer *raytracer;
-  Image *image;
   //Vec3f direction, position, orientation;
   Vec3f position, lowerLeft, xAxis, yAxis;
+	Color *output;
+	uintmax_t pixelcount;
+	
   
   // Callback functions for Render
   Ray GetCameraRay(double x, double y);
