@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <ostream>
 #include "vectors.h"
 #include "image.h"
 #include "raytracer.h"
@@ -12,22 +13,30 @@
 class Controller {
 
 public:
+  Controller(ArgParser *_args, RayTracer *_raytracer, int rank=0, int npes=1);
+  ~Controller();
 
-  Controller() : args(NULL), raytracer(NULL), image(NULL) {}
-  Controller(ArgParser *_args, RayTracer *_raytracer, Image *_image);
-  ~Controller() {}
+	const Controller &operator=(const Controller &rhs);
+	Controller(const Controller &rhs);
   
   void PartialRender( int processor_rank, int num_processor );
   void FullRender();
   void SetCamera();
+
+	void Output(Image &out);
+	void Output(std::ostream &out);
 
 private:
 
   // various variables
   ArgParser *args;
   RayTracer *raytracer;
-  Image *image;
   Vec3f position, lowerLeft, xAxis, yAxis;
+	Color *output;
+	uintmax_t pixelcount;
+	int processor_count;
+	int curr_proc;
+	
   
   // Callback functions for Render
   Ray GetCameraRay(double x, double y);
@@ -40,3 +49,5 @@ private:
 };
 
 #endif
+
+// vim: ts=2:sw=2

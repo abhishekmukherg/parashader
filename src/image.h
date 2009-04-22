@@ -11,7 +11,7 @@ class Color {
 public:
   Color(int r_=255, int g_=255, int b_=255) : r(r_),g(g_),b(b_) {}
   bool isWhite() const { return r==255 && g==255 && b==255; }
-  int r,g,b;
+  unsigned char r,g,b;
 };
 
 // ====================================================================

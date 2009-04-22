@@ -1,13 +1,23 @@
 #include "controller.h"
-
 // ========================================================
 // Initialize all appropriate variables, and ray-trace certain
 // pixels
 // ========================================================
 
 // Constructor
-Controller::Controller(ArgParser *_args, RayTracer *_raytracer, Image *_image) :
-  args(_args), raytracer(_raytracer), image(_image) { SetCamera(); }
+Controller::Controller(ArgParser *_args, RayTracer *_raytracer,
+		int nrank, int npes) :
+  args(_args), raytracer(_raytracer), processor_count(npes), curr_proc(nrank)
+{
+	SetCamera();
+	pixelcount = args->width * args->height;
+	output = new Color[(pixelcount/processor_count) + 1];
+}
+
+Controller::~Controller()
+{
+	delete[] output;
+}
 
 
 // sets the camera position based on args
@@ -87,41 +97,47 @@ Color Controller::DrawPixel(int x, int y) {
   if( b > 255 ) b = 255;
   
   //color image
-  Color toFill = Color( (int) r, (int) g, (int) b);
-  image->SetPixel( x, y, toFill );
+  Color toFill = Color( static_cast<int>(r),
+												static_cast<int>(g),
+												static_cast<int>(b));
   return toFill;
 }
 
 
 //Creates a full image
 void Controller::FullRender() {
-  int width = image->Width(), height = image->Height();
-  for( int i = 0; i < width; ++i ) {
-    for( int j = 0; j < height; ++j ) {
-      DrawPixel( i, j );
-    }
+  const int width = args->width;
+	Color *c = output;
+	for( uintmax_t pixel = curr_proc;
+					pixel < pixelcount;
+					pixel += processor_count) {
+		const int x = pixel % width;
+		const int y = pixel / width;
+		*c++ = DrawPixel( y, x );
   }
 }
 
-
-//Creates a partial image for MPI
-void Controller::PartialRender( int processor_rank, int num_processor ) {
-  int width = image->Width();
-  int total_pixels = width * image->Height();
-  int work_unit = total_pixels / num_processor;
-  int end, start = work_unit * processor_rank;
-  int x, y;
-  if( processor_rank == num_processor - 1 )
-    end = total_pixels;
-  else
-    end = work_unit + start;
-  for( int i = start; i < end; ++i ) {
-    x = i % width;
-    y = i / width;
-    DrawPixel( x, y );
-  }
+void Controller::Output(Image &out) {
+	const int width = args->width;
+	const int height = args->height;
+	const Color *c = output;
+	for( int i = 0; i < width; ++i ) {
+		for( int j = 0; j < height; ++j ) {
+			out.SetPixel(i, j, *c++);
+		}
+	}
 }
 
+void Controller::Output(std::ostream &out) {
+	const Color *c = output;
+	for( uintmax_t pixel = curr_proc;
+					pixel < pixelcount;
+					pixel += processor_count) {
+		out << static_cast<int>(c->r)
+					<< " " << static_cast<int>(c->g)
+					<< " " << static_cast<int>(c->b) << std::endl;
+	}
+}
 
 //Non-photorealistic filter
 void Controller::NPR(double &r, double &g, double &b) {
