@@ -91,6 +91,14 @@ public:
            camera_orientation.Set( 0, 1, 0 );
          else
            camera_orientation.Normalize();
+      } else if (!strcmp(argv[i],"-npr")) {
+         i++; assert (i < argc);
+         double x = atof(argv[i]);
+         i++; assert (i < argc);
+         double y = atof(argv[i]);
+         i++; assert (i < argc);
+         double z = atof(argv[i]);
+         npr = Vec3f(x,y,z);
       } else if (!strcmp(argv[i],"-gray")) {
         gray_scale = true;
       } else if (!strcmp(argv[i],"-ambient")) {
@@ -132,6 +140,7 @@ public:
     camera_position = Vec3f(0,0,0);
     camera_direction = Vec3f(0,0,0);
     camera_orientation = Vec3f(0,1,0);
+    npr = Vec3f(-1,-1,-1);
     background_color_linear = Vec3f(1,1,1);
     ambient_light = Vec3f(0.2,0.2,0.2);
     ambient_light_linear = 
@@ -163,6 +172,7 @@ public:
   Vec3f camera_direction;
   Vec3f camera_orientation;
   Vec3f background_color_linear;
+  Vec3f npr;
 
   int num_bounces;
   int num_shadow_samples;

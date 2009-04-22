@@ -35,7 +35,8 @@ private:
   Color DrawPixel(int x, int y);
   
   //Taro's random extensions
-  //void GrayScale(double &r, double &g, double &b);
+  void NPR(double &red, double &green, double &blue);
+  void GrayScale(double &red, double &green, double &blue);
 };
 
 #endif

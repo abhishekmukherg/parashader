@@ -73,16 +73,13 @@ Vec3f Controller::TraceRay(double x, double y) {
 Color Controller::DrawPixel(int x, int y) {
   // compute the color and position of intersection
   Vec3f color = TraceRay( double(x), double(y) );
-  double r = linear_to_srgb(color.x()) * 255.0;
-  double g = linear_to_srgb(color.y()) * 255.0;
-  double b = linear_to_srgb(color.z()) * 255.0;
+  double r = linear_to_srgb(color.x()) * 255;
+  double g = linear_to_srgb(color.y()) * 255;
+  double b = linear_to_srgb(color.z()) * 255;
   
   //Taro's random extensions
-  if( args->gray_scale ) {
-    //gray-scaling algorithm from
-    //http://www.mathworks.com/support/solutions/data/1-1ASCU.html
-    r = g = b = r * 0.299 + g * 0.587 + b * 0.114;
-  }
+  NPR(r,g,b);
+  GrayScale(r,g,b);
   
   //Make sure the r g b values are less than 255
   if( r > 255 ) r = 255;
@@ -123,5 +120,37 @@ void Controller::PartialRender( int processor_rank, int num_processor ) {
     y = i / width;
     DrawPixel( x, y );
   }
+}
+
+
+//Non-photorealistic filter
+void Controller::NPR(double &r, double &g, double &b) {
+  double splitRed = args->npr.x();
+  double splitGreen = args->npr.y();
+  double splitBlue = args->npr.z();
+  if( splitRed >= 0 && splitRed <= 1 ) {
+    r = splitRed * 255;
+  } else if( splitRed > 1 && splitRed < 255 ) {
+    //TODO
+  }
+  if( splitGreen >= 0 && splitGreen <= 1 ) {
+    g = splitGreen * 255;
+  } else if( splitGreen > 1 && splitGreen < 255 ) {
+    //TODO
+  }
+  if( splitBlue >= 0 && splitBlue <= 1 ) {
+    b = splitBlue * 255;
+  } else if( splitBlue > 1 && splitBlue < 255 ) {
+    //TODO
+  }
+}
+
+
+//Gray-scale filter
+void Controller::GrayScale(double &r, double &g, double &b) {
+  //gray-scaling algorithm from
+  //http://www.mathworks.com/support/solutions/data/1-1ASCU.html
+  if( args->gray_scale )
+    r = g = b = r * 0.299 + g * 0.587 + b * 0.114;
 }
 
