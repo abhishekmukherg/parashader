@@ -45,6 +45,7 @@ Ben Boeckel\thanks{e-mail: boeckb@rpi.edu} %
 
 \maketitle
 
+
 \begin{abstract}
 While libraries such as Nvidia's CUDA can greatly optimize the graphical
 application, it's pipeline structure causes inaccuracies to occur in lighting
@@ -54,6 +55,7 @@ With a massively parallel system such as Blue Gene, however, ray-tracing can be
 rendered at a much faster speed.
 \end{abstract}
 \keywordlist
+
 
 \section{Introduction}
 Several attributes aboute ray-tracing lends itself well to networked computers
@@ -76,8 +78,10 @@ In addition, a few extensions were added to create several filters similar to
 those found in image editors such as Adobe Photoshop. With a little tweaking, we
 can give graphics a bit of an artistic taste.
 
+
 \section{Parallelism}
 TODO
+
 
 \section{Filters}
 In an image editor, a filter is an algorithm that converts the pixel values to
@@ -87,8 +91,9 @@ value each corresponding to additive colors in lights.  Using these values,
 we can recalculate and compile a new image that gives a different impression
 from the original.
 
-In this case, we created a gray-scale filter and a hard-shading filter
+In this case, we created a gray-scale filter and a color-limiting filter
 that recalculates the generated pixel value from each ray in the ray-tracer.
+
 
 \section*{Gray Scale}
 Each pixel in a gray scale image is reperesented, frequently, by a single
@@ -105,7 +110,7 @@ green, and blue value equal to \gamma.  It's worth noting that the weight
 values must be carefully chosen, as it reperesents each color's contribution
 to the image.  For example, if we naively give equal weights to red, green,
 and blue, we get an overly-lit image.
-%TODO: add an image of overly-lit image
+%TODO: add 2 images: original_color.png, overly_lit_gray_scale.png
 
 To create the most acceptable color-to-gray-scale conversion, we used
 the weight values from
@@ -116,16 +121,48 @@ $W_{r}R = 0.299$
 $W_{g}G = 0.587$
 
 $W_{b}B = 0.114$
-%TODO: add an image of gray scale image
+%TODO: add normal_gray_scale.png
 
-\section*{Hard Shading}
-TODO
+
+\section*{Limiting Color}
+Many image editors includes an option to posterize an image, rendering
+a group of near-colored pixels to be shaded in one color.  While our program
+can not detect neighboring pixels, it can generalize colors to limited shades
+by calculating where it fall in the spectrum of the RGB value.
+
+Limiting the color spectrum is fairly easy.  We divide the color spectrum evenly to
+the number of shades the user wants.  If a pixel's value falls under any of the middle
+sections, we set it to a pre-computed value corresponding to that portion.  The only
+exception is towards the two ends, where they will be set to either 0 or maximum color
+value.
+%TODO: add 2 images: red_scale.png, red_shades.png
+
+The basic algorithm can be described as follows:
+
+\textit{Let $D$ be the quotient of maximum color value, $M$, divided by $n$ number of shades.}
+
+\textit{Let $S = M / (n - 1)$.}
+
+\textit{For index $i$ between 0 and $n$}
+
+\hspace{10 mm} \textit{If color red ($r$) is less than $i \times D$, set $r = S \times i$ }
+
+\textit{Repeat for green ($g$) and blue ($b$).}
+%TODO: add color_shades.png
+
 
 \section{Conclusion}
 TODO
 
+
 \section{Further Work}
 TODO
+
+\section*{Filters}
+Since every pixel value had no ability to reference from their consecutive neighbors,
+our filters had to be solely based on a single pixel value.  If we can devise a way to
+read neighboring pixel values, we could implement a more intelligent, visually pleasing
+filters to more varied artistry work.
 
 \section*{Related Works}
 
