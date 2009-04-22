@@ -1,0 +1,107 @@
+\documentclass{acmsiggraph}
+
+\usepackage[scaled=.92]{helvet}
+\usepackage{times}
+
+%% The 'graphicx' package allows for the inclusion of EPS figures.
+
+\usepackage{graphicx}
+
+%% use this for zero \parindent and non-zero \parskip, intelligently.
+
+\usepackage{parskip}
+
+%% Optional: the 'caption' package provides a nicer-looking replacement
+%% for the standard caption environment. With 'labelfont=bf,'textfont=it',
+%% caption labels are bold and caption text is italic.
+
+\usepackage[labelfont=bf,textfont=it]{caption}
+
+%% If you are submitting a paper to the annual conference, please replace 
+%% the value ``0'' below with the numeric value of your OnlineID. 
+%% If you are not submitting this paper to the annual conference, 
+%% you may safely leave it at ``0'' -- it will not be included in the output.
+
+\onlineid{0}
+\newcommand{\timestamp}{\textbf}
+
+%% Paper title.
+
+\title{Parallel Ray Tracing on the BlueGene/L}
+
+\author{%
+Ben Boeckel\thanks{e-mail: boeckb@rpi.edu} %
+\and Artem Kochnev\thanks{e-mail: kochna@rpi.edu} %
+\and Abhishek Mukherjee\thanks{e-mail: mukhea2@rpi.edu} %
+\and Taro Omiya\thanks{e-mail: omiyat@rpi.edu}}
+
+\keywords{parallel, raytracing, bluegene}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+While libraries such as Nvidia's CUDA can greatly optimize the graphical
+application, it's pipeline structure causes inaccuracies to occur in lighting
+physics.  As such, an efficient, accurate graphical application is required
+Ray-tracing can render lightings very accurately, but falls short in efficiency
+With a massively parallel system such as Blue Gene, however, ray-tracing can be
+rendered at a much faster speed.
+\end{abstract}
+\keywordlist
+
+\section{Introduction}
+Several attributes aboute ray-tracing lends itself well to networked computers
+such as the Blue Gene L, regardless of whether it uses threads or Message
+Passing Interface (MPI).  Each ray in ray-tracing acts independently from each
+other, and communication between each calculation occurs only in the end of
+tracing.  Finally, ray-tracing can be rendered using the CPU, only.
+
+Through this project, we will prove that it is possible to generate realistic
+graphics on a highly parallel system created originally for scientific uses.
+The libraries we plan to use is the MPI library for the Blue Gene L.
+The results will be a png image file.
+
+The program will be tested using the object models from Advanced Computer
+Graphics.  Various measurements will be used to test the performance of our
+program: the number of processors, number of models and texture, number of time
+rays can bounce, and number of samples for shadows.
+
+In addition, a few extensions were added to create several filters not unlike
+those found in many general-use image editors. With a little tweaking, we
+can give certain graphics an artistic taste.
+
+\section{Parallelism}
+TODO
+
+\section{Filters}
+TODO
+
+\section*{Related Works}
+
+\begin{itemize}
+\item
+\textbf{Distributing data and control for ray tracing in parallel} This paper
+discusses the data structures to be used to minimize data transfer in a
+parallel ray tracer. This will be an important consideration for us, as we
+begin writing our program for the BG/L. Although ray tracing is a relatively
+simple algorithm to implement in a parallel fashion, the only way to get proper
+efficiency out of the program is to manage the data, and the workload,
+properly. We hope this paper will relieve some of the burden of creating
+various parallel data structures to be used. This paper also discusses the
+common deadlocks that could occur in a ray tracing algorithm, which we also
+have to avoid.\cite{badouel1994dda}
+\item
+\textbf{Ray tracing on the cell processor} This paper discusses the special
+considerations that need to be taken into account for developing a ray tracer
+on a parallel algorithm. The architecture they were building for, the Cell, is
+a very different architecture from the BlueGene/L that we will be building our
+algorithm on. We belove that it will form a good basis to start from in our
+discussions about how to create the algorithm on the BG/L.\cite{benthin2006rtc}
+\item
+\end{itemize}
+
+\bibliographystyle{acmsiggraph}
+\bibliography{parashader}
+\end{document}
