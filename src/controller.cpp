@@ -118,3 +118,4 @@ void Controller::PartialRender( int processor_rank, int num_processor ) {
   }
 }
 
+// vim: ts=2:sw=2
