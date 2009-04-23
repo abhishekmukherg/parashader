@@ -1,5 +1,6 @@
 #include <cstring>
 #include <iostream>
+#include <mpi.h>
 #include "image.h"
 
 bool Image::Save(const std::string &filename) const {
@@ -39,36 +40,34 @@ bool Image::Load(const std::string &filename) {
     std::cerr << "ERROR: This is not a PPM filename: " << filename << std::endl;
     return false;
   }
-  FILE *file = fopen(filename.c_str(),"rb");
-  if (file == NULL) {
-    std::cerr << "Unable to open " << filename << " for reading\n";
-    return false;
-  }
+  MPI::File fh = MPI::File::Open(MPI::COMM_WORLD, filename.c_str(),
+		  MPI::MODE_RDONLY, MPI::INFO_NULL);
 
   // misc header information
-  char tmp[100];
-  fgets(tmp,100,file); 
+  char tmp[2<<20];
+  fh.Read(tmp, 2<<20, MPI::CHAR);
+  char *newline1 = strstr(tmp, "\n");
+  char *newline2 = strstr(newline1 + 1, "\n");
+  char *newline3 = strstr(newline2 + 1, "\n");
   assert (strstr(tmp,"P6"));
-  fgets(tmp,100,file); 
-  while (tmp[0] == '#') { fgets(tmp,100,file); }
-  sscanf(tmp,"%d %d",&width,&height);
-  fgets(tmp,100,file); 
-  assert (strstr(tmp,"255"));
+  sscanf(newline1+1,"%d %d",&width,&height);
+  assert (strstr(newline2+1,"255"));
 
   // the data
   delete [] data;
   data = new Color[height*width];
+  newline3 += 1;
   // flip y so that (0,0) is bottom left corner
   for (int y = height-1; y >= 0; y--) {
     for (int x = 0; x < width; x++) {
       Color c;
-      c.r = fgetc(file);
-      c.g = fgetc(file);
-      c.b = fgetc(file);
+      c.r = *newline3++;
+      c.g = *newline3++;
+      c.b = *newline3++;
       SetPixel(x,y,c);
     }
   }
-  fclose(file);
+  fh.Close();
   return true;
 }
 
