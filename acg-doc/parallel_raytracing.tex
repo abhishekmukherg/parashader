@@ -79,6 +79,22 @@ those found in image editors such as Adobe Photoshop. With a little tweaking, we
 can give graphics a bit of an artistic taste.
 
 
+\section{Related Works}
+Several papers has already delved into the topic of ray tracing for highly
+parallel systems.  One notable work is from Benthin and his work will ray
+tracing on the Cell processor, most commonly found in Sony's Playstation 3.
+His careful consideration in the architecture of the processor demonstrates the
+importance of the system's structure in calculations. \cite{benthin2006rtc}
+
+A more thorough analysis is found in Badouel's paper, where he mentions the
+specific structures, algorithms, and varies strategies to avoid costly data
+transfers on the Blue Gene L.  He uses scheduling and data managing to most
+effectively balance each processors' workload and minimize latency.  Furthermore,
+careful ways of avoiding common parallel problems, such as deadlocks, are
+addressed from this paper.  This will act as the main basis for our project. 
+\cite{badouel1994dda}
+
+
 \section{Parallelism}
 TODO
 
@@ -154,40 +170,23 @@ The basic algorithm can be described as follows:
 \section{Conclusion}
 TODO
 
-
-\section{Further Work}
-TODO
-
-\section*{Filters}
 Since every pixel value had no ability to reference from their consecutive neighbors,
 our filters had to be solely based on a single pixel value.  If we can devise a way to
 read neighboring pixel values, we could implement a more intelligent, visually pleasing
 filters to more varied artistry work.
 
-\section*{Related Works}
+
+\section{Citation}
 
 \begin{itemize}
 \item
-\textbf{Distributing data and control for ray tracing in parallel} This paper
-discusses the data structures to be used to minimize data transfer in a
-parallel ray tracer. This will be an important consideration for us, as we
-begin writing our program for the BG/L. Although ray tracing is a relatively
-simple algorithm to implement in a parallel fashion, the only way to get proper
-efficiency out of the program is to manage the data, and the workload,
-properly. We hope this paper will relieve some of the burden of creating
-various parallel data structures to be used. This paper also discusses the
-common deadlocks that could occur in a ray tracing algorithm, which we also
-have to avoid.\cite{badouel1994dda}
+\textbf{Distributing data and control for ray tracing in parallel} \cite{badouel1994dda}
 \item
-\textbf{Ray tracing on the cell processor} This paper discusses the special
-considerations that need to be taken into account for developing a ray tracer
-on a parallel algorithm. The architecture they were building for, the Cell, is
-a very different architecture from the BlueGene/L that we will be building our
-algorithm on. We belove that it will form a good basis to start from in our
-discussions about how to create the algorithm on the BG/L.\cite{benthin2006rtc}
+\textbf{Ray tracing on the cell processor} \cite{benthin2006rtc}
 \item
 \end{itemize}
 
 \bibliographystyle{acmsiggraph}
 \bibliography{parashader}
 \end{document}
+
