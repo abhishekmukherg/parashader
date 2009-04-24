@@ -107,8 +107,10 @@ on another pixel on the screen. Therefore, it is possible to have $N$ processors
 working on its own pixel and simply joining the resulting colors together to get
 a complete image. 
 
+
+\subsection{Load Balancing}
 A couple interesting problems arise when going to multi-scalar processors. One
-important problem is load balancing.. Properly using multiple processors cannot
+important problem is load balancing. Properly using multiple processors cannot
 be done unless every processor is always doing work.  Having times where
 processors have to wait for another processors results will cause a program's
 efficiency to plummet. Thus work has to be distributed in such a way where each
@@ -119,7 +121,11 @@ However, we felt this early preprocessing would not make sense for super-scalar
 architectures like the BG/L because it would just take too much time.
 \cite{benthin2006rtc} also discusses several load balancing schemes that were
 specifically designed to match the Cell architecture and it's limitations in
-memory. We decided to go with an algorithm similar to the one from Baduel et
+memory.
+
+
+\subsection{Implementation}
+We decided to go with an algorithm similar to the one from Baduel et
 al., However, instead of preprocessing the data, we simply indexed each pixel
 into a one dimensional array and gave processor $N$ all pixels, $i$, such that
 \begin{equation}
@@ -128,20 +134,7 @@ i \mod{N} \equiv 0
 
 The idea behind this would be that each region would be shared between the
 processors. Therefore if one region is difficult to compute, all processors
-should have some share in the region. Our algorithm worked decently well except
-when the computation for pixels is absurdly larger than the computation for
-other pixels. For example, if the number of reflective bounces is set to sixty,
-the computation becomes completely weighted against all the processors that
-hold these pixels. Specifically for the BG/L, this is an incredibly bad
-circumstance. The BG/L devotes all it's resources to multiple processors rather
-than processor speed. We encountered multiple times when it seemed like the
-computer entered into a state of deadlock, two or more processors are waiting
-for input from another processor in the cycle so no one can do work, because the
-processors just could not get any of the work done. It was believed to be
-deadlock because the same computation could run on a simple 2GHz
-Intel Core 2\texttrademark{} laptop in a reasonable amount of time. The
-difference was that the laptop could process a ray that bounces 100 times, while
-the 700MHz PowerPC processor in the BG/L could not.
+should have some share in the region.
 
 \section{Filters}
 In an image editor, a filter is an algorithm that converts the pixel values to
@@ -181,9 +174,9 @@ weight values from \cite{mw11ASCU} to get the bottom image in Figure
 \ref{gray_scale}.
 
 \begin{align}
-W_{r}R &= 0.299 \\
-W_{g}G &= 0.587 \\
-W_{b}B &= 0.114
+W_{r} &= 0.299 \\
+W_{g} &= 0.587 \\
+W_{b} &= 0.114
 \end{align}
 
 \begin{figure}[htp]
@@ -208,12 +201,12 @@ Limiting the color spectrum is fairly easy.  We divide the color spectrum
 evenly to the number of shades the user wants.  If a pixel's value falls under
 any of the middle sections, we set it to a pre-computed value corresponding to
 that portion.  The only exception is towards the two ends, where they will be
-set to either 0 or maximum color value.
+set to either minimum or maximum color value.
 \begin{figure}[htp]
 \centering
 \includegraphics[width=1.5in]{red_scale}
 \includegraphics[width=1.5in]{red_shades}
-\caption{Left image: }%TODO: Taro fill this in}
+\caption{Left image: full red scale image. Right image: red scale image limited to 3 shades.}
 \label{red_limiting_color}
 \end{figure}
 
@@ -234,19 +227,36 @@ number of shades.}
 \begin{figure}[htp]
 \centering
 \includegraphics[width=1.5in]{color_shades}
-\caption{Left image: }%TODO: Taro fill this in}
+\caption{Above: red, green, and blue are limited to 3 shades, for a total of 27 colors.}
 \label{limiting_color}
 \end{figure}
 
 \section{Conclusion}
-\section{Further Work}
-TODO
+\subsection{Parallelism}
+Our parallel algorithm worked decently well except when the computation for pixels
+is absurdly larger than the computation for other pixels. For example, if the
+number of reflective bounces is set to sixty, the computation becomes completely
+weighted against all the processors that hold these pixels. Specifically for
+the BG/L, this is an incredibly bad circumstance. The BG/L devotes all it's
+resources to multiple processors rather than processor speed. We encountered
+multiple times when it seemed like the computer entered into a state of deadlock,
+two or more processors are waiting for input from another processor in the cycle
+so no one can do work, because the processors just could not get any of the work
+done. It was believed to be deadlock because the same computation could run on a
+simple 2GHz Intel Core 2\texttrademark{} laptop in a reasonable amount of time.
+The difference was that the laptop could process a ray that bounces 100 times,
+while the 700MHz PowerPC processor in the BG/L could not.
 
 \subsection{Filters}
-Since every pixel value had no ability to reference from their consecutive
-neighbors, our filters had to be solely based on a single pixel value.  If we
-can devise a way to read neighboring pixel values, we could implement a more
-intelligent, visually pleasing filters to more varied artistry work.
+On filters, we were mostly satisfied with the gray scale filtering.  The
+limited colors also faired well to our expectations. However, no pixel value had
+the ability to reference from their consecutive neighbors.  Since our filters had
+to be solely based on a single pixel value, it created some unnecessary noise from
+very similar colors, causing the image to look artificial.  If we could devise a
+way to read neighboring pixel values, we could implement a more intelligent,
+visually pleasing filters to create artistic work.  In addition, the ability
+to format and re-map colors based on an external file could add more expression
+to our limited and inflexible algorithm.
 
 
 \section{Citation}
