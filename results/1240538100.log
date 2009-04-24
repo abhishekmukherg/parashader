@@ -1,0 +1,15 @@
+/usr/bin/time mpirun -np 1 /home/omiyat/git/parashader/src/render -input /home/omiyat/git/parashader/objects/reflective_spheres.obj -background_color 0.2 0.1 0.6 -cam_pos 4 1 4 -output 1240538100.ppm -num_bounces 2 -num_shadow_samples 10 -size 200 200
+ mesh loaded 82
+-----------------------------------------------------------------------------
+It seems that [at least] one of the processes that was started with
+mpirun did not invoke MPI_INIT before quitting (it is possible that
+more than one process did not invoke MPI_INIT -- mpirun was only
+notified of the first one, which was on node n0).
+
+mpirun can *only* be used with MPI programs (i.e., programs that
+invoke MPI_INIT and MPI_FINALIZE).  You can use the "lamexec" program
+to run non-MPI programs over the lambooted nodes.
+-----------------------------------------------------------------------------
+Command exited with non-zero status 252
+0.00user 0.00system 0:06.56elapsed 0%CPU (0avgtext+0avgdata 0maxresident)k
+0inputs+0outputs (0major+387minor)pagefaults 0swaps
