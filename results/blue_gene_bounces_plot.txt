@@ -1,0 +1,7 @@
+# res 1024x1024, shadow_samples 100
+# num_bounces time(s)
+10 24.03
+20 29.15
+30 120.91
+40 354
+
