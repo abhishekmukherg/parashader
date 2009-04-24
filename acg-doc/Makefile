@@ -9,14 +9,14 @@ parallel_raytracing: parallel_raytracing.tex parashader.bib color_shades.eps \
 	latex $<
 
 blue_gene_bounces_plot.png:
-	ln -s ../render/$@
+	ln -s ../results/$@
 blue_gene_pixels_plot.png:
-	ln -s ../render/$@
+	ln -s ../results/$@
 taro_desktop_plot.png:
-	ln -s ../render/$@
+	ln -s ../results/$@
 
 %.eps: %.png
 	convert $< $@
 
 clean:
-	rm -f *.eps *.aux *.bbl *.blg *.dvi *.log *.out
+	rm -f *.eps *.aux *.bbl *.blg *.dvi *.log *.out blue_gene_bounces_plot.png blue_gene_pixels_plot.png taro_desktop_plot.png
