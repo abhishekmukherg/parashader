@@ -247,21 +247,44 @@ simple 2GHz Intel Core 2\texttrademark{} laptop in a reasonable amount of time.
 The difference was that the laptop could process a ray that bounces 100 times,
 while the 700MHz PowerPC processor in the BG/L could not.
 
+\subsection{Performance}
+A few changes in stats were compared.  For example, the time it took to complete
+the ray tracing images in the BG/L are shown in Figure \ref{plot_bgl_bounces} and
+Figure  \ref{plot_bgl_pixels}.  Figure \ref{plot_bgl_bounces} shows a typical
+exponential growth in time as the number of bounces calculated increases.
+This is expected, as more bounces increases the number of times a ray recurses.
+
+Figure \ref{plot_bgl_pixels} is more unusual.  One would expect the performance
+behavior in increasing the number of pixels would cause linear growth in time,
+since a ray is issued for each pixel.  This is not the case, however.
+There is a sudden increase in performance when the number of pixels is increased
+to 2560000 units, before it continues off with its usual linear growth. 
+We believe this burst of performance may come from the nature of how BG/L was built.
+Since 2560000 is a power of 2, it makes it simple for the system to make
+binary computations.
+
+For comparison, we decided to test our algorithm on a typical machine in figure 
+\ref{plot_taro_desktop}.
+
 \begin{figure}[htp]
 \centering
 \includegraphics[width=3in]{blue_gene_bounces_plot}
 \caption{Time to render number of bounces on a BG/L. The image size used was 1024x1024.}
+\label{plot_bgl_bounces}
 \end{figure}
 
 \begin{figure}[htp]
 \centering
 \includegraphics[width=3in]{blue_gene_pixels_plot}
-\caption{Time to render number of pixels on a BG/L. The number of bounces was 30 and the number of shadow bounces was 100}
+\caption{Time to render number of pixels on a BG/L. The number of bounces was 30 and the number of shadow bounces was 100.}
+\label{plot_bgl_pixels}
 \end{figure}
 
 \begin{figure}[htp]
 \centering
 \includegraphics[width=3in]{taro_desktop_plot}
+\caption{Time to render number of bounces on a Intel Core 2 Duo, 1.8GHz, 2 GB RAM, customized desktop. The image size used was 200x200, and the number of shadow bounces was 10.}
+\label{plot_taro_desktop}
 \end{figure}
 
 \subsection{Filters}
