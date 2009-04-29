@@ -7,5 +7,5 @@ set yrange [100:240]
 
 set grid ytics
 
-set output "blue_gene_pixels_plot.eps"
+set output "blue_gene_pixels_plot.png"
 pl "blue_gene_pixels_plot.txt" u 1:2 lw 1 title "256 processors" w linespoints

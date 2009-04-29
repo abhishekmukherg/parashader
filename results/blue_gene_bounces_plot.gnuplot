@@ -7,5 +7,5 @@ set yrange [0:400]
 
 set grid ytics
 
-set output "blue_gene_bounces_plot.eps"
+set output "blue_gene_bounces_plot.png"
 pl "blue_gene_bounces_plot.txt" u 1:2 lw 1 title "256 processor" w linespoints

@@ -7,5 +7,5 @@ set yrange [100:150]
 
 set grid ytics
 
-set output "timings-test1.eps"
+set output "timings-test1.png"
 pl "timings-test1.txt" u 1:2 lw 1 title "30 bounces" w linespoints
