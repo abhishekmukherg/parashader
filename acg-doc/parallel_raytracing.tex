@@ -55,7 +55,7 @@ While libraries such as Nvidia's CUDA can greatly optimize the graphical
 application, it's pipeline structure causes inaccuracies to occur in lighting
 physics.  As such, an efficient, accurate graphical application is required
 Ray-tracing can render lightings very accurately, but falls short in efficiency
-With a massively parallel system such as BlueGene/L (BG/L), however, ray-tracing can be
+With a massively parallel system such as BlueGene/L, however, ray-tracing can be
 rendered at a much faster speed.
 \end{abstract}
 \keywordlist
@@ -63,14 +63,14 @@ rendered at a much faster speed.
 
 \section{Introduction}
 Several attributes about ray-tracing lends itself well to networked computers
-such as the BG/L, regardless of whether it uses threads or Message
+such as the Blue Gene/L, regardless of whether it uses threads or Message
 Passing Interface (MPI).  Each ray in ray-tracing acts independently from each
 other, and communication between each calculation occurs only in the end of
 tracing.  Finally, ray-tracing can be rendered using the CPU, only.
 
 Through this project, we will prove that it is possible to generate realistic
 graphics on a highly parallel system created originally for scientific uses.
-The libraries we plan to use is the MPI library for the BG/L.
+The libraries we plan to use is the MPI library for the Blue Gene/L.
 The results will be a PPM image file.
 
 The program will be tested using the object models from Advanced Computer
@@ -118,7 +118,7 @@ processor is doing about the same amount of work. There are a few ways to do
 this for ray tracing as discussed by \cite{badouel1994dda}. These include things
 like preprocessing the image into chunks and distributing it to the processors.
 However, we felt this early preprocessing would not make sense for super-scalar
-architectures like the BG/L because it would just take too much time.
+architectures like the Blue Gene/L because it would just take too much time.
 \cite{benthin2006rtc} also discusses several load balancing schemes that were
 specifically designed to match the Cell architecture and it's limitations in
 memory.
@@ -237,7 +237,7 @@ Our parallel algorithm worked decently well except when the computation for pixe
 is absurdly larger than the computation for other pixels. For example, if the
 number of reflective bounces is set to sixty, the computation becomes completely
 weighted against all the processors that hold these pixels. Specifically for
-the BG/L, this is an incredibly bad circumstance. The BG/L devotes all it's
+the Blue Gene/L, this is an incredibly bad circumstance. The Blue Gene/L devotes all it's
 resources to multiple processors rather than processor speed. We encountered
 multiple times when it seemed like the computer entered into a state of deadlock,
 two or more processors are waiting for input from another processor in the cycle
@@ -245,11 +245,11 @@ so no one can do work, because the processors just could not get any of the work
 done. It was believed to be deadlock because the same computation could run on a
 simple 2GHz Intel Core 2\texttrademark{} laptop in a reasonable amount of time.
 The difference was that the laptop could process a ray that bounces 100 times,
-while the 700MHz PowerPC processor in the BG/L could not.
+while the 700MHz PowerPC processor in the Blue Gene/L could not.
 
 \subsection{Performance}
 A few changes in stats were compared.  For example, the time it took to complete
-the ray tracing images in the BG/L are shown in Figure \ref{plot_bgl_bounces} and
+the ray tracing images in the Blue Gene/L are shown in Figure \ref{plot_bgl_bounces} and
 Figure  \ref{plot_bgl_pixels}.  Figure \ref{plot_bgl_bounces} shows a typical
 exponential growth in time as the number of bounces calculated increases.
 This is expected, as more bounces increases the number of times a ray recurses.
@@ -259,24 +259,25 @@ behavior in increasing the number of pixels would cause linear growth in time,
 since a ray is issued for each pixel.  This is not the case, however.
 There is a sudden increase in performance when the number of pixels is increased
 to 2560000 units, before it continues off with its usual linear growth. 
-We believe this burst of performance may come from the nature of how BG/L was built.
+We believe this burst of performance may come from the nature of how Blue Gene/L was built.
 Since 2560000 is a power of 2, it makes it simple for the system to make
 binary computations.
 
 For comparison, we decided to test our algorithm on a typical machine in figure 
-\ref{plot_taro_desktop}.
+\ref{plot_taro_desktop}.  While the lower number of statistics makes it slightly
+difficult to compare to the Blue Gene/L
 
 \begin{figure}[htp]
 \centering
 \includegraphics[width=3in]{blue_gene_bounces_plot}
-\caption{Time to render number of bounces on a BG/L. The image size used was 1024x1024.}
+\caption{Time to render number of bounces on a Blue Gene/L. The image size used was 1024x1024.}
 \label{plot_bgl_bounces}
 \end{figure}
 
 \begin{figure}[htp]
 \centering
 \includegraphics[width=3in]{blue_gene_pixels_plot}
-\caption{Time to render number of pixels on a BG/L. The number of bounces was 30 and the number of shadow bounces was 100.}
+\caption{Time to render number of pixels on a Blue Gene/L. The number of bounces was 30 and the number of shadow bounces was 100.}
 \label{plot_bgl_pixels}
 \end{figure}
 
@@ -306,7 +307,7 @@ to our limited and inflexible algorithm.
 \textbf{Distributing data and control for ray tracing in parallel} This paper
 discusses the data structures to be used to minimize data transfer in a parallel
 ray tracer. This will be an important consideration for us, as we begin writing
-our program for the BG/L. Although ray tracing is a relatively
+our program for the Blue Gene/L. Although ray tracing is a relatively
 simple algorithm to implement in a parallel fashion, the only way to get proper
 efficiency out of the program is to manage the data, and the workload, properly.
 We hope this paper will relieve some of the burden of creating various parallel
@@ -317,9 +318,9 @@ avoid.\cite{badouel1994dda}
 \textbf{Ray tracing on the cell processor} This paper discusses the special
 considerations that need to be taken into account for developing a ray tracer on
 a parallel algorithm. The architecture they were building for, the Cell, is a
-very different architecture from the BG/L that we will be building our algorithm
+very different architecture from the Blue Gene/L that we will be building our algorithm
 on. We belove that it will form a good basis to start from in our discussions
-about how to create the algorithm on the BG/L.\cite{benthin2006rtc}
+about how to create the algorithm on the Blue Gene/L.\cite{benthin2006rtc}
 \end{itemize}
 
 \bibliographystyle{acmsiggraph}
