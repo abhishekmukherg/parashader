@@ -250,7 +250,7 @@ while the 700MHz PowerPC processor in the Blue Gene/L could not.
 \subsection{Performance}
 A few changes in stats were compared.  For example, the time it took to complete
 the ray tracing images in the Blue Gene/L are shown in Figure \ref{plot_bgl_bounces} and
-Figure  \ref{plot_bgl_pixels}.  Figure \ref{plot_bgl_bounces} shows a typical
+Figure \ref{plot_bgl_pixels}.  Figure \ref{plot_bgl_bounces} shows a typical
 exponential growth in time as the number of bounces calculated increases.
 This is expected, as more bounces increases the number of times a ray recurses.
 
@@ -264,8 +264,11 @@ Since 2560000 is a power of 2, it makes it simple for the system to make
 binary computations.
 
 For comparison, we decided to test our algorithm on a typical machine in figure 
-\ref{plot_taro_desktop}.  While the lower number of statistics makes it slightly
-difficult to compare to the Blue Gene/L
+\ref{plot_taro_desktop}.  While the lower statistical values makes it slightly
+difficult to compare to the Blue Gene/L, it's quite clear that raising these stats
+to Figure \ref{plot_bgl_bounces} would be much, much slower.  The number of processors,
+and the much higher OS jitter caused by other daemon jobs causes the typical desktop
+performance to be much lower than the Blue Gene/L.
 
 \begin{figure}[htp]
 \centering
