@@ -268,6 +268,11 @@ We believe this burst of performance may come from the nature of how Blue Gene/L
 Since 2560000 is a power of 2, it makes it simple for the system to make
 binary computations.
 
+Figure \ref{timings-test2} demonstrates the performance based on the number of processors.
+As expected, the time it takes to render the same image decreases logarithmically as
+the number of processors increases.  In fact, in each generation, the times halves.
+This proves that the ray tracing calculation is indeed the majority of the process.
+
 For comparison, we decided to test our algorithm on a typical machine in figure 
 \ref{plot_taro_desktop}.  While the lower statistical values makes it slightly
 difficult to compare to the Blue Gene/L, it's quite clear that raising these stats
@@ -291,13 +296,6 @@ performance to be much lower than the Blue Gene/L.
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=3in]{taro_desktop_plot}
-\caption{Time to render number of bounces on a Intel Core 2 Duo, 1.8GHz, 2 GB RAM, customized desktop. The image size used was 200x200, and the number of shadow bounces was 10.}
-\label{plot_taro_desktop}
-\end{figure}
-
-\begin{figure}[tbp]
-\centering
 \includegraphics[width=3in]{timings-test1}
 \caption{Time to render 4096 x 4096 resolution image with 30 bounces}
 \label{timings-test1}
@@ -308,6 +306,13 @@ performance to be much lower than the Blue Gene/L.
 \includegraphics[width=3in]{timings-test2}
 \caption{Time to render 4096 x 4096 resolution image with 5 bounces}
 \label{timings-test2}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=3in]{taro_desktop_plot}
+\caption{Time to render number of bounces on a Intel Core 2 Duo, 1.8GHz, 2 GB RAM, customized desktop. The image size used was 200x200, and the number of shadow bounces was 10.}
+\label{plot_taro_desktop}
 \end{figure}
 
 \subsection{Filters}
