@@ -335,9 +335,17 @@ have found ways to better optimize the memory uses.  Additionally, startegies
 to avoid using objects should be considered, if we intended to keep the files as C++.
 
 \subsection{Filters}
+Our original intention for integrating "filters" in the ray tracing program
+was to turn a ray tracer to a non-photorealistic renderer. We meant to convert the colors
+bouncing off of each object to different solid shades.  However, time did not permit
+us to do this process, and therefore, a simpler approach was taken.
+
 As previously mentioned, a more intelligent filtering process could have been used.
-Clearly, the initial problem we have with this part is that it's integrated with
-the ray tracing.  If we made a seperate 
+If the filters were made as a seperate executeable that processes an image
+as input and generate a new, stylized image, it would have been easier to find
+neighboring pixels.  Again, since this was not our original intention, this process was
+not implement.   We may consider using such a strategy, however, on a normal
+desktop environment rather than the Blue Gene/L.
 
 
 \section{Citation}
