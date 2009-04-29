@@ -184,7 +184,7 @@ W_{g} &= 0.587 \\
 W_{b} &= 0.114
 \end{align}
 
-\begin{figure}[htp]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=1.5in]{original_color}
 \includegraphics[width=1.5in]{overly_lit_gray_scale}
@@ -207,7 +207,7 @@ evenly to the number of shades the user wants.  If a pixel's value falls under
 any of the middle sections, we set it to a pre-computed value corresponding to
 that portion.  The only exception is towards the two ends, where they will be
 set to either minimum or maximum color value.
-\begin{figure}[htp]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=1.5in]{red_scale}
 \includegraphics[width=1.5in]{red_shades}
@@ -229,7 +229,7 @@ number of shades.}
 
 \textit{Repeat for green ($g$) and blue ($b$).}
 
-\begin{figure}[htp]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=1.5in]{color_shades}
 \caption{Above: red, green, and blue are limited to 3 shades, for a total of 27 colors.}
@@ -275,21 +275,21 @@ to Figure \ref{plot_bgl_bounces} would be much, much slower.  The number of proc
 and the much higher OS jitter caused by other daemon jobs causes the typical desktop
 performance to be much lower than the Blue Gene/L.
 
-\begin{figure}[htp]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=3in]{blue_gene_bounces_plot}
 \caption{Time to render number of bounces on a Blue Gene/L. The image size used was 1024x1024.}
 \label{plot_bgl_bounces}
 \end{figure}
 
-\begin{figure}[htp]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=3in]{blue_gene_pixels_plot}
 \caption{Time to render number of pixels on a Blue Gene/L. The number of bounces was 30 and the number of shadow bounces was 100.}
 \label{plot_bgl_pixels}
 \end{figure}
 
-\begin{figure}[htp]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=3in]{taro_desktop_plot}
 \caption{Time to render number of bounces on a Intel Core 2 Duo, 1.8GHz, 2 GB RAM, customized desktop. The image size used was 200x200, and the number of shadow bounces was 10.}
