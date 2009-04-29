@@ -320,8 +320,8 @@ would have been to convert the C++ files to the equivalent, yet less complex C
 versions.  Unfortunately, such a solution tend to be difficult and time-consuming.
 
 Another problem we have is that only the first processor writes the image.  Since our load
-balancing strategy forces us to use MPI_Gather, we could have used the combination
-of MPI_Scatter and the asynchronous MPI_File_iwrite_at to have all processors
+balancing strategy forces us to use MPI\_Gather, we could have used the combination
+of MPI\_Scatter and the asynchronous MPI\_File\_iwrite\_at to have all processors
 write on the file instead, creating a more efficient file writing process.
 
 We've also found many dynamic calculations when the program was still

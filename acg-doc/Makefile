@@ -20,7 +20,7 @@ parallel_raytracing.dvi: parallel_raytracing.tex parashader.bib color_shades.eps
 	convert $< $@
 
 %.eps:
-	if [[ ! -f $@ ]]; then \
+	if [ ! -f $@ ]; then \
 		make -C ../results; \
 		ln -s ../results/$@; \
 	fi
