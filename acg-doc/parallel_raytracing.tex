@@ -314,10 +314,30 @@ parallel side and the filter side.
 
 \subsection{Parallelism}
 Due to time constraints, we made a basic copy off of our homework 3 from
-Advanced Computer Graphics.
+Advanced Computer Graphics written in C++.  The obvious problem with this is
+that C++ doesn't lend itself well to parallelizing.  An easy optimization method
+would have been to convert the C++ files to the equivalent, yet less complex C
+versions.  Unfortunately, such a solution tend to be difficult and time-consuming.
+
+Another problem we have is that only the first processor writes the image.  Since our load
+balancing strategy forces us to use MPI_Gather, we could have used the combination
+of MPI_Scatter and the asynchronous MPI_File_iwrite_at to have all processors
+write on the file instead, creating a more efficient file writing process.
+
+We've also found many dynamic calculations when the program was still
+intended to use OpenGL. While all of the OpenGL was stripped in favor of MPI,
+several unnecessary process that was supposed to use interactive keyboard and mouse
+coordinate may have been left-over.  With more time, we could have hunted down and
+simplified these process to a constant function.
+
+Finally, memory management was the biggest problem.  With more time, we could
+have found ways to better optimize the memory uses.  Additionally, startegies
+to avoid using objects should be considered, if we intended to keep the files as C++.
 
 \subsection{Filters}
-
+As previously mentioned, a more intelligent filtering process could have been used.
+Clearly, the initial problem we have with this part is that it's integrated with
+the ray tracing.  If we made a seperate 
 
 
 \section{Citation}
