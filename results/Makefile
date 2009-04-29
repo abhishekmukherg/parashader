@@ -8,3 +8,5 @@ all: blue_gene_bounces_plot.eps blue_gene_pixels_plot.eps taro_desktop_plot.eps 
 
 clean:
 	rm *.png *.eps
+
+.PHONY: clean

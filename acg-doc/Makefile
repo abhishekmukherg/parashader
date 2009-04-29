@@ -1,4 +1,4 @@
-all: parallel_raytracing.pdf 
+all: parallel_raytracing.dvi
 
 parallel_raytracing.pdf: parallel_raytracing.dvi
 	dvipdf $<
@@ -20,8 +20,10 @@ parallel_raytracing.dvi: parallel_raytracing.tex parashader.bib color_shades.eps
 	convert $< $@
 
 %.eps:
-	make -C ../results
-	ln -s ../results/$@
+	if [[ ! -f $@ ]]; then \
+		make -C ../results; \
+		ln -s ../results/$@; \
+	fi
 
 clean:
-	rm -f *.eps *.aux *.bbl *.blg *.log *.out *.png parallel_raytracing.dvi parallel_raytracing.pdf
+	rm -f *.eps *.aux *.bbl *.blg *.log *.out parallel_raytracing.dvi parallel_raytracing.pdf
