@@ -97,7 +97,6 @@ careful ways of avoiding common parallel problems, such as deadlocks, are
 addressed from this paper.  This will act as the main basis for our project. 
 \cite{badouel1994dda}
 
-
 \section{Parallelism}
 Ray tracing is inherently a very parallel operation. For each pixel in the
 image, the algorithm traces out what will be hit by a ray coming from the
@@ -105,7 +104,13 @@ camera, and then tries to figure out what color that object will be. The work
 for one pixel on the resulting image is entirely independent from the work done
 on another pixel on the screen. Therefore, it is possible to have $N$ processors
 working on its own pixel and simply joining the resulting colors together to get
-a complete image. 
+a complete image.
+
+While each pixel are rendered sperately, several strategies could further
+optimize the ray tracing process. One must consider the cache,
+filesystem, and processor structure of the Blue Gene/L to create an efficient,
+specialized program.  Additionally, one must intelligently balance each ray tracing
+process, as they are not of equal complexity.
 
 
 \subsection{Load Balancing}
